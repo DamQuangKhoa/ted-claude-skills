@@ -78,11 +78,27 @@ main() {
     
     # Download claude.md
     print_info "Downloading claude.md..."
-    backup_if_exists "$CLAUDE_DIR/claude.md"
-    if download_file "$REPO_BASE_URL/claude.md" "$CLAUDE_DIR/claude.md"; then
-        print_success "claude.md downloaded"
+    
+    # Download to temp file first
+    TEMP_CLAUDE_MD="/tmp/claude_installer_$$.md"
+    if download_file "$REPO_BASE_URL/claude.md" "$TEMP_CLAUDE_MD"; then
+        if [ -f "$CLAUDE_DIR/claude.md" ]; then
+            # File exists, append content
+            print_info "  → Existing claude.md found, appending content..."
+            backup_if_exists "$CLAUDE_DIR/claude.md"
+            echo "" >> "$CLAUDE_DIR/claude.md"
+            echo "" >> "$CLAUDE_DIR/claude.md"
+            echo "<!-- Added by Ted's Claude Skills installer -->" >> "$CLAUDE_DIR/claude.md"
+            cat "$TEMP_CLAUDE_MD" >> "$CLAUDE_DIR/claude.md"
+            print_success "  → Content appended to existing claude.md"
+        else
+            # File doesn't exist, create it
+            cp "$TEMP_CLAUDE_MD" "$CLAUDE_DIR/claude.md"
+            print_success "claude.md created"
+        fi
     else
         print_error "Failed to download claude.md"
+        rm -f "$TEMP_CLAUDE_MD"
         exit 1
     fi
     
@@ -99,12 +115,12 @@ main() {
             echo "" >> "$COPILOT_INSTRUCTIONS"
             echo "" >> "$COPILOT_INSTRUCTIONS"
             echo "<!-- Added by Ted's Claude Skills installer -->" >> "$COPILOT_INSTRUCTIONS"
-            cat "$CLAUDE_DIR/claude.md" >> "$COPILOT_INSTRUCTIONS"
+            cat "$TEMP_CLAUDE_MD" >> "$COPILOT_INSTRUCTIONS"
             print_success "  → Content appended to existing copilot-instructions.md"
         else
             # File doesn't exist, create it
             print_info "  → Creating new copilot-instructions.md..."
-            cp "$CLAUDE_DIR/claude.md" "$COPILOT_INSTRUCTIONS"
+            cp "$TEMP_CLAUDE_MD" "$COPILOT_INSTRUCTIONS"
             print_success "  → copilot-instructions.md created"
         fi
     else
@@ -113,6 +129,9 @@ main() {
         print_info "  → Skipping GitHub Copilot instructions setup"
         print_info "  → To enable: create .github folder and run installer again"
     fi
+    
+    # Clean up temp file
+    rm -f "$TEMP_CLAUDE_MD"
     
     # Download skills
     print_info "Installing skills..."

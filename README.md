@@ -12,6 +12,7 @@ curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main
 ```
 
 **Example:**
+
 ```bash
 cd /Users/ted/company/project/LYCC/console/flava-console/apps/product-lb
 curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main/install.sh | bash
@@ -42,11 +43,14 @@ After installation, files will be created in your current directory:
 - `./.github/copilot-instructions.md` - GitHub Copilot instructions (only if `.github/` folder exists)
 
 **How it works:**
-- `.claude/` folder is always created with configurations and skills
-- If `.github/` folder exists:
-  - If `.github/copilot-instructions.md` doesn't exist → creates it with content from `claude.md`
-  - If `.github/copilot-instructions.md` already exists → appends content from `claude.md` to it
-- If `.github/` folder doesn't exist → skips GitHub Copilot setup (you can run installer again after creating `.github/`)
+
+- `.claude/` folder is always created with skills
+- **For `.claude/claude.md`:**
+  - If doesn't exist → creates it with fresh content
+  - If already exists → appends fresh content to it (with backup)
+- **For `.github/copilot-instructions.md`** (only if `.github/` folder exists):
+  - If doesn't exist → creates it with fresh content
+  - If already exists → appends fresh content to it
 - GitHub Copilot in VS Code will automatically read instructions from `.github/copilot-instructions.md`
 
 **Note**: Run the install command from your project root directory where you want to add Claude skills.
@@ -77,6 +81,7 @@ The script will automatically backup old files before updating.
 ## 📝 Directory Structure
 
 **In your project after installation:**
+
 ```
 your-project/
 ├── .claude/                          # Always created
@@ -95,6 +100,7 @@ your-project/
 ```
 
 **In this repository:**
+
 ```
 .
 ├── README.md
