@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Ted's Claude Skills Installer
-# Usage: curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/install.sh | bash -s [profile]
+# Usage: curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main/install.sh | bash -s [profile]
 
 set -e
 
@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 PROFILE="${1:-default}"
 CLAUDE_DIR="$HOME/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
-REPO_BASE_URL="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main"
+REPO_BASE_URL="https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main"
 
 # Function to print colored messages
 print_info() {
@@ -125,16 +125,6 @@ main() {
         fi
     done
     
-    # Skill 2: weekly-report
-    print_info "  → Installing weekly-report..."
-    mkdir -p "$SKILLS_DIR/weekly-report"
-    
-    if download_file "$REPO_BASE_URL/skills/weekly-report/SKILL.md" "$SKILLS_DIR/weekly-report/SKILL.md"; then
-        print_success "    ✓ SKILL.md"
-    else
-        print_warning "    ⚠ Failed to download weekly-report SKILL.md"
-    fi
-    
     print_success "Skills installation completed"
     
     # Set proper permissions
@@ -153,7 +143,6 @@ main() {
     echo "Installed components:"
     echo "  • claude.md configuration"
     echo "  • skill-creator skill"
-    echo "  • weekly-report skill"
     echo ""
     print_info "VS Code will automatically load these configurations on next restart"
     echo ""

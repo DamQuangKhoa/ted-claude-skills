@@ -24,15 +24,12 @@ curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main
    - Run evals and benchmarks
    - Optimize descriptions
 
-2. **weekly-report**: Skill for creating weekly reports
-
 ## 🎯 Usage
 
 After installation, files will be located at:
 
 - `~/.claude/claude.md` - Main configuration
 - `~/.claude/skills/skill-creator/` - Skill creator
-- `~/.claude/skills/weekly-report/` - Weekly report skill
 
 VS Code will automatically load these configurations on next restart.
 
@@ -54,16 +51,14 @@ The script will automatically backup old files before updating.
 ├── claude.md
 ├── install.sh
 └── skills/
-    ├── skill-creator/
-    │   ├── SKILL.md
-    │   ├── LICENSE.txt
-    │   ├── agents/
-    │   ├── assets/
-    │   ├── eval-viewer/
-    │   ├── references/
-    │   └── scripts/
-    └── weekly-report/
-        └── SKILL.md
+    └── skill-creator/
+        ├── SKILL.md
+        ├── LICENSE.txt
+        ├── agents/
+        ├── assets/
+        ├── eval-viewer/
+        ├── references/
+        └── scripts/
 ```
 
 ## 📄 License
