@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 PROFILE="${1:-default}"
-CLAUDE_DIR="$HOME/.claude"
+CLAUDE_DIR="$(pwd)/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 REPO_BASE_URL="https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main"
 
@@ -64,6 +64,8 @@ main() {
     echo "║   Ted's Claude Skills Installer       ║"
     echo "║   Profile: ${PROFILE}                 ║"
     echo "╚════════════════════════════════════════╝"
+    echo ""
+    print_info "Installing to: $(pwd)/.claude"
     echo ""
     
     # Create directory structure
@@ -141,10 +143,10 @@ main() {
     print_success "Claude configuration installed to: $CLAUDE_DIR"
     echo ""
     echo "Installed components:"
-    echo "  • claude.md configuration"
-    echo "  • skill-creator skill"
+    echo "  • .claude/claude.md configuration"
+    echo "  • .claude/skills/skill-creator/ skill"
     echo ""
-    print_info "VS Code will automatically load these configurations on next restart"
+    print_info "VS Code will automatically detect .claude folder in your workspace"
     echo ""
 }
 

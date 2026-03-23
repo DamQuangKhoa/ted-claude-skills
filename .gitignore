@@ -3,6 +3,9 @@
 .AppleDouble
 .LSOverride
 
+# Claude configuration (when installed in projects)
+.claude/
+
 # Thumbnails
 ._*
 

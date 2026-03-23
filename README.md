@@ -4,11 +4,20 @@ A collection of skills and customizations for Claude AI in VS Code.
 
 ## 📦 Quick Installation
 
-Run the following command to automatically install:
+Navigate to your project directory and run:
 
 ```bash
+cd /path/to/your/project
 curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main/install.sh | bash
 ```
+
+**Example:**
+```bash
+cd /Users/ted/company/project/LYCC/console/flava-console/apps/product-lb
+curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main/install.sh | bash
+```
+
+This will create a `.claude` folder in your current directory with all the configurations and skills.
 
 ## 📋 Contents
 
@@ -26,12 +35,23 @@ curl -fsSL https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main
 
 ## 🎯 Usage
 
-After installation, files will be located at:
+After installation, files will be created in your current directory:
 
-- `~/.claude/claude.md` - Main configuration
-- `~/.claude/skills/skill-creator/` - Skill creator
+- `./.claude/claude.md` - Main configuration
+- `./.claude/skills/skill-creator/` - Skill creator
 
-VS Code will automatically load these configurations on next restart.
+VS Code will automatically detect the `.claude` folder in your workspace.
+
+**Note**: Run the install command from your project root directory where you want to add Claude skills.
+
+### 📂 Adding .claude to .gitignore
+
+The `.claude` folder contains project-specific configurations and typically should not be committed to your repository. Add this to your project's `.gitignore`:
+
+```
+# Claude AI configuration
+.claude/
+```
 
 ## 🔄 Updates
 
