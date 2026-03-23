@@ -16,6 +16,8 @@ NC='\033[0m' # No Color
 PROFILE="${1:-default}"
 CLAUDE_DIR="$(pwd)/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
+GITHUB_DIR="$(pwd)/.github"
+COPILOT_INSTRUCTIONS="$GITHUB_DIR/copilot-instructions.md"
 REPO_BASE_URL="https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main"
 
 # Function to print colored messages
@@ -84,6 +86,34 @@ main() {
         exit 1
     fi
     
+    # Setup GitHub Copilot instructions
+    print_info "Setting up GitHub Copilot instructions..."
+    
+    if [ -d "$GITHUB_DIR" ]; then
+        # .github folder exists
+        print_success "  → .github folder found"
+        
+        if [ -f "$COPILOT_INSTRUCTIONS" ]; then
+            # File exists, append content
+            print_info "  → Existing copilot-instructions.md found, appending content..."
+            echo "" >> "$COPILOT_INSTRUCTIONS"
+            echo "" >> "$COPILOT_INSTRUCTIONS"
+            echo "<!-- Added by Ted's Claude Skills installer -->" >> "$COPILOT_INSTRUCTIONS"
+            cat "$CLAUDE_DIR/claude.md" >> "$COPILOT_INSTRUCTIONS"
+            print_success "  → Content appended to existing copilot-instructions.md"
+        else
+            # File doesn't exist, create it
+            print_info "  → Creating new copilot-instructions.md..."
+            cp "$CLAUDE_DIR/claude.md" "$COPILOT_INSTRUCTIONS"
+            print_success "  → copilot-instructions.md created"
+        fi
+    else
+        # .github folder doesn't exist
+        print_warning "  → .github folder not found"
+        print_info "  → Skipping GitHub Copilot instructions setup"
+        print_info "  → To enable: create .github folder and run installer again"
+    fi
+    
     # Download skills
     print_info "Installing skills..."
     
@@ -145,8 +175,16 @@ main() {
     echo "Installed components:"
     echo "  • .claude/claude.md configuration"
     echo "  • .claude/skills/skill-creator/ skill"
+    if [ -d "$GITHUB_DIR" ] && [ -f "$COPILOT_INSTRUCTIONS" ]; then
+        echo "  • .github/copilot-instructions.md (for GitHub Copilot)"
+    fi
     echo ""
-    print_info "VS Code will automatically detect .claude folder in your workspace"
+    if [ -d "$GITHUB_DIR" ] && [ -f "$COPILOT_INSTRUCTIONS" ]; then
+        print_info "GitHub Copilot will now read instructions from .github/copilot-instructions.md"
+    else
+        print_info "GitHub Copilot instructions not installed (.github folder not found)"
+        print_info "To enable: mkdir .github && run installer again"
+    fi
     echo ""
 }
 

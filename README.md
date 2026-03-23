@@ -37,20 +37,31 @@ This will create a `.claude` folder in your current directory with all the confi
 
 After installation, files will be created in your current directory:
 
-- `./.claude/claude.md` - Main configuration
+- `./.claude/claude.md` - Configuration reference
 - `./.claude/skills/skill-creator/` - Skill creator
+- `./.github/copilot-instructions.md` - GitHub Copilot instructions (only if `.github/` folder exists)
 
-VS Code will automatically detect the `.claude` folder in your workspace.
+**How it works:**
+- `.claude/` folder is always created with configurations and skills
+- If `.github/` folder exists:
+  - If `.github/copilot-instructions.md` doesn't exist → creates it with content from `claude.md`
+  - If `.github/copilot-instructions.md` already exists → appends content from `claude.md` to it
+- If `.github/` folder doesn't exist → skips GitHub Copilot setup (you can run installer again after creating `.github/`)
+- GitHub Copilot in VS Code will automatically read instructions from `.github/copilot-instructions.md`
 
 **Note**: Run the install command from your project root directory where you want to add Claude skills.
 
 ### 📂 Adding .claude to .gitignore
 
-The `.claude` folder contains project-specific configurations and typically should not be committed to your repository. Add this to your project's `.gitignore`:
+The `.claude` folder contains configurations and typically should not be committed to your repository. However, `.github/copilot-instructions.md` should be committed so your team can benefit from the instructions.
+
+Add this to your project's `.gitignore`:
 
 ```
-# Claude AI configuration
+# Claude AI configuration (local reference)
 .claude/
+
+# Keep .github/copilot-instructions.md tracked for the team
 ```
 
 ## 🔄 Updates
@@ -65,6 +76,25 @@ The script will automatically backup old files before updating.
 
 ## 📝 Directory Structure
 
+**In your project after installation:**
+```
+your-project/
+├── .claude/                          # Always created
+│   ├── claude.md
+│   └── skills/
+│       └── skill-creator/
+│           ├── SKILL.md
+│           ├── LICENSE.txt
+│           ├── agents/
+│           ├── assets/
+│           ├── eval-viewer/
+│           ├── references/
+│           └── scripts/
+└── .github/                          # Only if this folder already exists
+    └── copilot-instructions.md       # Created or appended
+```
+
+**In this repository:**
 ```
 .
 ├── README.md
