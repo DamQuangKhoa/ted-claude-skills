@@ -1,0 +1,47 @@
+{
+  "skill_name": "flava-commit-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just finished adding a new detail overview page for the network LB. The changes are in client/src/pages/network/ and client/src/composables/lb/. The ticket is LYCC-8687. Can you commit this for me?",
+      "expected_output": "A commit message like 'feat(lb): LYCC-8687: Add network LB detail overview page' — type should be feat, scope should be lb (not client or network), ticket LYCC-8687, sentence-case description starting with a verb.",
+      "files": [],
+      "expectations": [
+        "Commit message starts with 'feat('",
+        "Scope is 'lb' (not 'client' or 'network')",
+        "Contains 'LYCC-8687'",
+        "Description is in sentence case (first letter uppercase)",
+        "Header is ≤ 100 characters",
+        "Message matches pattern: type(scope): TICKET: Description"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "commit my changes - i fixed a css bug in the mcp-hub styling, QA reported it as CLOUDQA-83659",
+      "expected_output": "A commit message like 'fix(mcp-hub): CLOUDQA-83659: Fix the style of manual config' — type should be fix, scope mcp-hub, CLOUDQA ticket pattern, sentence-case description.",
+      "files": [],
+      "expectations": [
+        "Commit message starts with 'fix('",
+        "Scope is 'mcp-hub'",
+        "Contains 'CLOUDQA-83659'",
+        "Description is in sentence case",
+        "Header is ≤ 100 characters",
+        "Message matches pattern: type(scope): TICKET: Description"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "i refactored the api-gateway config actions to use the new useModalManager pattern. no jira ticket for this one, just some cleanup. please commit",
+      "expected_output": "A commit message like 'refactor(api-gateway): NO-JIRA: Switch config actions to useModalManager flow' — type should be refactor, scope api-gateway, NO-JIRA, sentence-case description.",
+      "files": [],
+      "expectations": [
+        "Commit message starts with 'refactor('",
+        "Scope is 'api-gateway'",
+        "Contains 'NO-JIRA'",
+        "Description is in sentence case",
+        "Header is ≤ 100 characters",
+        "Message matches pattern: type(scope): TICKET: Description"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "skill_name": "blog-post-creator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Turn these notes into a blog post:\n\nSetting up Tailwind CSS in Next.js 15\n- Install tailwindcss, postcss, autoprefixer\n- Run npx tailwindcss init -p\n- Configure tailwind.config.js (content paths)\n- Add @tailwind directives to globals.css\n- Can use app router or pages router\n- Dark mode: class strategy is easier than media\n- Install prettier-plugin-tailwindcss for auto-sorting\n- Common gotcha: forgetting to add page paths to content array\n- Tip: use @apply sparingly, prefer utility classes",
+      "expected_output": "A guide-style blog post with step-by-step setup instructions, in both Vietnamese and English. Should include code examples, a configuration comparison table, and warnings about common mistakes.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want to write about why React Server Components are important. My notes:\n\nProblem with traditional React:\n- Everything renders on client\n- Large bundle sizes\n- Data fetching = waterfall issues\n- SEO challenges\n\nRSC solution:\n- Components render on server\n- Zero JS to client for server components\n- Can directly access DB/APIs\n- Automatic code splitting\n- Better performance\n\nHow it works:\n- .server.js = server only\n- .client.js = client only  \n- Default = server component\n- Client components = 'use client' directive\n\nCan you create a blog post from this?",
+      "expected_output": "A concept explanation style post that starts with the problem, builds understanding progressively, uses diagrams to show the difference, and explains how RSCs work from first principles. Both Vietnamese and English versions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Blog post idea: Redux vs Zustand vs Context API\n\nNeed to help devs choose. My quick notes:\n\nContext API:\n- Built-in, no install\n- Good for simple state\n- Re-renders can be problematic\n- No middleware\n- Best for: theme, auth, small apps\n\nRedux:\n- Most mature\n- Great devtools\n- Boilerplate heavy\n- Redux Toolkit helps\n- Time-travel debugging\n- Best for: large apps, complex state\n\nZustand:\n- Minimal boilerplate\n- Simple API\n- Hooks-based\n- Middleware support\n- Growing community\n- Best for: medium apps, modern projects\n\nMake this into a proper comparison post",
+      "expected_output": "A comprehensive guide-style comparison with tables, code examples for each approach, decision matrix, and recommendations. Should work for both beginners and experienced developers.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Write a blog post about JWT authentication. I only have these points:\n- What is JWT\n- Access token vs refresh token\n- Where to store tokens (localStorage vs httpOnly cookies)\n- Token refresh flow\n- Security concerns",
+      "expected_output": "Should recognize this needs concept explanation style. Must enhance the brief notes into a full educational post with security warnings, diagrams of the flow, code examples, and best practices. Both languages.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I have this detailed outline for a post about API rate limiting:\n\n# Rate Limiting APIs\n\n## Why rate limit?\n- Prevent abuse\n- Protect resources\n- Fair usage\n- Cost control\n\n## Strategies:\n1. Fixed window\n   - Simple counter resets at intervals\n   - Cons: burst at window edge\n   \n2. Sliding window\n   - More accurate\n   - Slightly complex\n   \n3. Token bucket\n   - Allows bursts\n   - Good for variable loads\n   \n4. Leaky bucket\n   - Smooth rate\n   - Queues requests\n\n## Implementation\n- Redis for distributed systems\n- In-memory for single server\n- Express middleware example\n- Headers: X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset\n\n## When user hits limit\n- Return 429 status\n- Include Retry-After header\n- Clear error message\n\nTurn this into a complete blog post",
+      "expected_output": "Should structure this as a guide with clear sections, add code examples for each strategy, comparison table of strategies, implementation code, and best practices. The outline is detailed so less enhancement needed but should still add examples and polish.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "hey can u make a blog post about git rebase vs merge? \n\nso like, merge creates a merge commit, rebase rewrites history. \nrebase makes linear history which looks cleaner. \nbut dont rebase public branches thats bad. \nmerge is safer for teams. \nrebase is good for feature branches before PR. \ni use git rebase -i for cleaning up commits. \ngit pull --rebase is useful too.\n\nthats all i got, make it good plz",
+      "expected_output": "Should handle casual tone and transform into professional content. Concept explanation style showing when to use each. Must add warnings about rebase dangers, step-by-step examples, visual diagrams of history, and real-world workflow recommendations. Clean up grammar and structure while preserving key points.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Create blog post from my notes on WebSockets:\n\nWebSocket = persistent connection between client & server\nHTTP = request/response, closes after each request\nWebSocket = bidirectional, real-time\n\nUse cases:\n- Chat apps\n- Live notifications  \n- Collaborative editing (Google Docs style)\n- Gaming\n- Stock tickers\n\nHow it works:\n- Handshake starts as HTTP\n- Upgrades to WS protocol\n- Connection stays open\n- Both sides can send messages anytime\n\nSocket.io vs native WebSocket:\n- Socket.io = easier, fallbacks, rooms\n- Native = more control, lighter\n\nCode example needed: simple chat with Socket.io",
+      "expected_output": "Concept explanation style starting with the problem HTTP doesn't solve, then explaining WebSocket solution. Include comparison tables, connection flow diagram, Socket.io vs native comparison, and complete chat example. Both Vietnamese and English.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Blog post about TypeScript utility types:\n\nPartial<T> - makes all properties optional\nRequired<T> - opposite of Partial\nReadonly<T> - all properties readonly\nPick<T, K> - select specific properties\nOmit<T, K> - exclude specific properties  \nRecord<K, T> - object with keys K and values T\nExclude<T, U> - remove types from union\nExtract<T, U> - extract types from union\nNonNullable<T> - exclude null and undefined\nReturnType<T> - get return type of function\n\nEach needs example\nWhen to use which one\nReal-world scenarios",
+      "expected_output": "Guide style with each utility type as a section. Include code examples showing before/after, use cases, common patterns, and a decision table for which to use when. Should be reference-style but educational.",
+      "files": []
+    }
+  ]
+}
