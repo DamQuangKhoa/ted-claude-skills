@@ -189,9 +189,9 @@ main() {
     )
     
     for file in "${flava_commit_files[@]}"; do
-        dest="$CLAUDE_DIR/skills/$(basename $(dirname $(dirname $file)))/$(basename $file)"
+        dest="$CLAUDE_DIR/skills/flava-commit-skill/$(basename $file)"
         if [[ "$file" == *"/evals/"* ]]; then
-            dest="$CLAUDE_DIR/skills/$(basename $(dirname $(dirname $(dirname $file))))/evals/$(basename $file)"
+            dest="$CLAUDE_DIR/skills/flava-commit-skill/evals/$(basename $file)"
         fi
         if download_file "$REPO_BASE_URL/$file" "$dest"; then
             print_success "    ✓ $(basename $file)"
