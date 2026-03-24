@@ -16,6 +16,7 @@ NC='\033[0m' # No Color
 # Configuration
 CLAUDE_DIR="$(pwd)/.claude"
 SKILLS_DIR="$CLAUDE_DIR/skills"
+FLAVA_SKILLS_DIR="$CLAUDE_DIR/testing-skill/flava"
 GITHUB_DIR="$(pwd)/.github"
 COPILOT_INSTRUCTIONS="$GITHUB_DIR/copilot-instructions.md"
 REPO_BASE_URL="https://raw.githubusercontent.com/DamQuangKhoa/ted-claude-skills/main"
@@ -73,6 +74,7 @@ main() {
     print_info "Creating directory structure..."
     mkdir -p "$CLAUDE_DIR"
     mkdir -p "$SKILLS_DIR"
+    mkdir -p "$FLAVA_SKILLS_DIR"
     print_success "Directories created"
     
     # Download claude.md
@@ -180,8 +182,8 @@ main() {
     
     # Skill 2: flava-commit-skill
     print_info "  Installing flava-commit-skill..."
-    mkdir -p "$SKILLS_DIR/flava-commit-skill"
-    mkdir -p "$SKILLS_DIR/flava-commit-skill/evals"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-commit-skill"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-commit-skill/evals"
     
     local flava_commit_files=(
         "testing-skill/flava/flava-commit-skill/SKILL.md"
@@ -189,9 +191,9 @@ main() {
     )
     
     for file in "${flava_commit_files[@]}"; do
-        dest="$CLAUDE_DIR/skills/flava-commit-skill/$(basename $file)"
+        dest="$FLAVA_SKILLS_DIR/flava-commit-skill/$(basename $file)"
         if [[ "$file" == *"/evals/"* ]]; then
-            dest="$CLAUDE_DIR/skills/flava-commit-skill/evals/$(basename $file)"
+            dest="$FLAVA_SKILLS_DIR/flava-commit-skill/evals/$(basename $file)"
         fi
         if download_file "$REPO_BASE_URL/$file" "$dest"; then
             print_success "    ✓ $(basename $file)"
@@ -202,9 +204,9 @@ main() {
     
     # Skill 3: flava-jira-check
     print_info "  Installing flava-jira-check..."
-    mkdir -p "$SKILLS_DIR/flava-jira-check"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-jira-check"
     
-    if download_file "$REPO_BASE_URL/testing-skill/flava/flava-jira-check/SKILL.md" "$SKILLS_DIR/flava-jira-check/SKILL.md"; then
+    if download_file "$REPO_BASE_URL/testing-skill/flava/flava-jira-check/SKILL.md" "$FLAVA_SKILLS_DIR/flava-jira-check/SKILL.md"; then
         print_success "    ✓ SKILL.md"
     else
         print_warning "    ⚠ Failed to download SKILL.md"
@@ -212,8 +214,8 @@ main() {
     
     # Skill 4: flava-jira-create-sre-ticket
     print_info "  Installing flava-jira-create-sre-ticket..."
-    mkdir -p "$SKILLS_DIR/flava-jira-create-sre-ticket"
-    mkdir -p "$SKILLS_DIR/flava-jira-create-sre-ticket/evals"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-jira-create-sre-ticket"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-jira-create-sre-ticket/evals"
     
     local flava_sre_files=(
         "testing-skill/flava/flava-jira-create-sre-ticket/SKILL.md"
@@ -221,9 +223,9 @@ main() {
     )
     
     for file in "${flava_sre_files[@]}"; do
-        dest="$CLAUDE_DIR/skills/flava-jira-create-sre-ticket/$(basename $file)"
+        dest="$FLAVA_SKILLS_DIR/flava-jira-create-sre-ticket/$(basename $file)"
         if [[ "$file" == *"/evals/"* ]]; then
-            dest="$CLAUDE_DIR/skills/flava-jira-create-sre-ticket/evals/$(basename $file)"
+            dest="$FLAVA_SKILLS_DIR/flava-jira-create-sre-ticket/evals/$(basename $file)"
         fi
         if download_file "$REPO_BASE_URL/$file" "$dest"; then
             print_success "    ✓ $(basename $file)"
@@ -234,8 +236,8 @@ main() {
     
     # Skill 5: flava-pr-skill
     print_info "  Installing flava-pr-skill..."
-    mkdir -p "$SKILLS_DIR/flava-pr-skill"
-    mkdir -p "$SKILLS_DIR/flava-pr-skill/evals"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-pr-skill"
+    mkdir -p "$FLAVA_SKILLS_DIR/flava-pr-skill/evals"
     
     local flava_pr_files=(
         "testing-skill/flava/flava-pr-skill/SKILL.md"
@@ -243,9 +245,9 @@ main() {
     )
     
     for file in "${flava_pr_files[@]}"; do
-        dest="$CLAUDE_DIR/skills/flava-pr-skill/$(basename $file)"
+        dest="$FLAVA_SKILLS_DIR/flava-pr-skill/$(basename $file)"
         if [[ "$file" == *"/evals/"* ]]; then
-            dest="$CLAUDE_DIR/skills/flava-pr-skill/evals/$(basename $file)"
+            dest="$FLAVA_SKILLS_DIR/flava-pr-skill/evals/$(basename $file)"
         fi
         if download_file "$REPO_BASE_URL/$file" "$dest"; then
             print_success "    ✓ $(basename $file)"
@@ -273,10 +275,10 @@ main() {
     echo "Installed components:"
     echo "  • .claude/claude.md configuration"
     echo "  • .claude/skills/skill-creator-v2/"
-    echo "  • .claude/skills/flava-commit-skill/"
-    echo "  • .claude/skills/flava-jira-check/"
-    echo "  • .claude/skills/flava-jira-create-sre-ticket/"
-    echo "  • .claude/skills/flava-pr-skill/"
+    echo "  • .claude/testing-skill/flava/flava-commit-skill/"
+    echo "  • .claude/testing-skill/flava/flava-jira-check/"
+    echo "  • .claude/testing-skill/flava/flava-jira-create-sre-ticket/"
+    echo "  • .claude/testing-skill/flava/flava-pr-skill/"
     if [ -d "$GITHUB_DIR" ] && [ -f "$COPILOT_INSTRUCTIONS" ]; then
         echo "  • .github/copilot-instructions.md (for GitHub Copilot)"
     fi
