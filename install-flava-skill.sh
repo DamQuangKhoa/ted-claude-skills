@@ -254,6 +254,28 @@ main() {
         fi
     done
     
+    # Skill 6: flava-weekly-report
+    print_info "  Installing flava-weekly-report..."
+    mkdir -p "$SKILLS_DIR/flava-weekly-report"
+    mkdir -p "$SKILLS_DIR/flava-weekly-report/evals"
+    
+    local flava_weekly_files=(
+        "testing-skill/flava/flava-weekly-report/SKILL.md"
+        "testing-skill/flava/flava-weekly-report/evals/evals.json"
+    )
+    
+    for file in "${flava_weekly_files[@]}"; do
+        dest="$SKILLS_DIR/flava-weekly-report/$(basename $file)"
+        if [[ "$file" == *"/evals/"* ]]; then
+            dest="$SKILLS_DIR/flava-weekly-report/evals/$(basename $file)"
+        fi
+        if download_file "$REPO_BASE_URL/$file" "$dest"; then
+            print_success "    ✓ $(basename $file)"
+        else
+            print_warning "    ⚠ Failed to download $(basename $file)"
+        fi
+    done
+    
     echo ""
     print_success "Skills installation completed"
     
@@ -277,6 +299,7 @@ main() {
     echo "  • .claude/skills/flava-jira-check/"
     echo "  • .claude/skills/flava-jira-create-sre-ticket/"
     echo "  • .claude/skills/flava-pr-skill/"
+    echo "  • .claude/skills/flava-weekly-report/"
     if [ -d "$GITHUB_DIR" ] && [ -f "$COPILOT_INSTRUCTIONS" ]; then
         echo "  • .github/copilot-instructions.md (for GitHub Copilot)"
     fi

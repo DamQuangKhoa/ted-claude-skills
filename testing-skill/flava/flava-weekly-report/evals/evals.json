@@ -1,0 +1,40 @@
+{
+  "skill_name": "weekly-report",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I need a weekly update for my manager. Format a report from this Jira snapshot for the last 7 days. Group by component. Assume these are my tickets.\n\nTickets:\n- LYCC-6101 | Component: ALB | Summary: Fixed routing rules validation on UI | Status: Done | Notes: Corrected rule handling\n- LYCC-6102 | Component: ALB | Summary: Increased upstream/downstream timeout caps | Status: Done | Notes: Meets new latency requirements\n- CLOUDQA-9901 | Component: QA Automation | Summary: Reduced flake rate in nightly suite | Status: In Progress | Notes: Stabilized three tests",
+      "expected_output": "Grouped sections with ticket counts; each key as [KEY](https://jira.workers-hub.com/browse/KEY); body uses - bullets only; no closing Summary section",
+      "files": [],
+      "assertions": [
+        "Output contains https://jira.workers-hub.com/browse/ for every ticket key present in the prompt",
+        "Output uses markdown links [PROJ-NUM](url) with matching key in text and URL path",
+        "Output uses line-leading - bullets for lists, not ordered 1. 2. lists",
+        "Output does not end with a Summary or **Summary** rollup section",
+        "Output mentions all three issue keys from the prompt (LYCC-6101, LYCC-6102, CLOUDQA-9901)"
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "Weekly report from the data below. Group by project key if components are missing. Time range: last week.\n\n- LYCC-6200 | Summary: Updated ALB overview diagram | Status: Done\n- LYCC-6201 | Summary: Export rules as YAML | Status: Done\n- CLOUDQA-8800 | Summary: Wrong error code on 404 | Status: Done",
+      "expected_output": "LYCC vs CLOUDQA groups (or similar); Jira browse links; bullets; no Summary section",
+      "files": [],
+      "assertions": [
+        "Every issue key (LYCC-6200, LYCC-6201, CLOUDQA-8800) appears as a markdown link to jira.workers-hub.com/browse/",
+        "No **Summary** section or ## Summary heading as a closing rollup",
+        "Primary list formatting uses - bullets, not 1. 2. numbering"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Generate my Flava weekly activity report for the past week using ONLY these issues. Do not add a Summary at the end. Every ticket must be a markdown link to jira.workers-hub.com. Use bullets only.\n\nLYCC-7001 Vector Search | improved recall tuning | done\nCLOUDQA-7700 | fixed auth mock in integration tests | done",
+      "expected_output": "Two tickets with correct links; bullets; explicit user constraints honored",
+      "files": [],
+      "assertions": [
+        "LYCC-7001 and CLOUDQA-7700 each appear as [KEY](https://jira.workers-hub.com/browse/KEY)",
+        "Output has no trailing Summary block",
+        "No ordered list (lines starting with digit + period + space) for ticket rows"
+      ]
+    }
+  ]
+}
