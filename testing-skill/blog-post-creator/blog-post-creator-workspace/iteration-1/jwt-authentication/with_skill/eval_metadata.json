@@ -1,0 +1,35 @@
+{
+  "eval_id": 4,
+  "eval_name": "jwt-authentication",
+  "prompt": "Write blog post about JWT authentication from brief bullet points",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "concept_style_used",
+      "description": "Uses concept explanation style given the educational nature"
+    },
+    {
+      "name": "content_enhanced",
+      "description": "Significantly expands the brief bullet points into comprehensive content"
+    },
+    {
+      "name": "has_code_examples",
+      "description": "Includes implementation code for JWT handling, token refresh, storage"
+    },
+    {
+      "name": "has_security_warnings",
+      "description": "Emphasizes security concerns with warnings and best practices"
+    },
+    {
+      "name": "covers_all_topics",
+      "description": "Covers: What is JWT, access vs refresh tokens, storage options, refresh flow, security"
+    },
+    {
+      "name": "has_workflow_diagram",
+      "description": "Includes visual representation of token refresh flow or authentication process"
+    }
+  ]
+}

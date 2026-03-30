@@ -1,0 +1,35 @@
+{
+  "eval_id": 7,
+  "eval_name": "websockets",
+  "prompt": "Create blog post from notes about WebSockets",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "concept_style_used",
+      "description": "Uses concept explanation starting with HTTP problem then WebSocket solution"
+    },
+    {
+      "name": "has_comparison_table",
+      "description": "Compares HTTP vs WebSocket and Socket.io vs native WebSocket"
+    },
+    {
+      "name": "has_complete_chat_example",
+      "description": "Includes full working Socket.io chat implementation (server + client)"
+    },
+    {
+      "name": "covers_all_use_cases",
+      "description": "Mentions all use cases: chat, notifications, collaborative editing, gaming, stock tickers"
+    },
+    {
+      "name": "explains_handshake",
+      "description": "Explains the HTTP to WebSocket upgrade handshake process"
+    },
+    {
+      "name": "has_connection_diagram",
+      "description": "Includes visual representation of WebSocket connection lifecycle"
+    }
+  ]
+}

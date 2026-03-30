@@ -1,0 +1,35 @@
+{
+  "eval_id": 2,
+  "eval_name": "react-server-components",
+  "prompt": "Create blog post about why React Server Components are important",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "concept_style_used",
+      "description": "Uses concept explanation style with problem-first approach and subsection numbering (1.1, 1.2)"
+    },
+    {
+      "name": "problem_solution_narrative",
+      "description": "Starts with traditional React problems, then introduces RSC solution"
+    },
+    {
+      "name": "has_diagrams",
+      "description": "Includes visual aids like ASCII diagrams or workflow representations"
+    },
+    {
+      "name": "has_code_examples",
+      "description": "Contains before/after code comparisons showing RSC usage"
+    },
+    {
+      "name": "covers_all_concepts",
+      "description": "Covers: problems, RSC benefits, how it works, 'use client' directive"
+    },
+    {
+      "name": "proper_structure",
+      "description": "Has engaging hook, progressive disclosure, and clear sections"
+    }
+  ]
+}

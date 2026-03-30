@@ -1,0 +1,35 @@
+{
+  "eval_id": 6,
+  "eval_name": "git-rebase-merge",
+  "prompt": "Transform casual notes about git rebase vs merge into professional blog post",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "professional_tone",
+      "description": "Transforms casual/informal input into professional, polished content"
+    },
+    {
+      "name": "concept_style_used",
+      "description": "Uses concept explanation style to teach when to use each approach"
+    },
+    {
+      "name": "has_visual_diagrams",
+      "description": "Includes git history visualizations showing merge vs rebase results"
+    },
+    {
+      "name": "emphasizes_golden_rule",
+      "description": "Prominently warns against rebasing public branches"
+    },
+    {
+      "name": "covers_all_points",
+      "description": "Covers: merge commits, history rewriting, when to use each, interactive rebase, pull --rebase"
+    },
+    {
+      "name": "has_workflow_guidance",
+      "description": "Provides practical workflow recommendations for teams"
+    }
+  ]
+}

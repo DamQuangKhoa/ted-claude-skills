@@ -1,0 +1,35 @@
+{
+  "eval_id": 8,
+  "eval_name": "typescript-utilities",
+  "prompt": "Create reference guide for TypeScript utility types",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "guide_style_used",
+      "description": "Uses guide/reference style appropriate for utility type documentation"
+    },
+    {
+      "name": "covers_all_ten_types",
+      "description": "Covers all 10 utility types: Partial, Required, Readonly, Pick, Omit, Record, Exclude, Extract, NonNullable, ReturnType"
+    },
+    {
+      "name": "has_code_examples",
+      "description": "Each utility type has before/after code examples"
+    },
+    {
+      "name": "has_real_world_scenarios",
+      "description": "Includes practical real-world use cases for the utility types"
+    },
+    {
+      "name": "has_decision_guidance",
+      "description": "Provides guidance on when to use which utility type"
+    },
+    {
+      "name": "has_reference_table",
+      "description": "Includes quick reference table of all utility types"
+    }
+  ]
+}

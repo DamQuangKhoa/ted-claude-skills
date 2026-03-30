@@ -1,0 +1,35 @@
+{
+  "eval_id": 1,
+  "eval_name": "tailwind-setup",
+  "prompt": "Turn these notes into a blog post about setting up Tailwind CSS in Next.js 15",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese (blog-post-vi.md) and English (blog-post-en.md) files are created"
+    },
+    {
+      "name": "guide_style_used",
+      "description": "Uses guide/tutorial style with numbered sections (Phần/Part 1, 2, etc.)"
+    },
+    {
+      "name": "has_code_examples",
+      "description": "Contains multiple code examples with proper syntax highlighting"
+    },
+    {
+      "name": "has_comparison_table",
+      "description": "Includes at least one comparison or reference table"
+    },
+    {
+      "name": "covers_all_points",
+      "description": "Covers all points from input: install, config, directives, dark mode, prettier, gotchas"
+    },
+    {
+      "name": "proper_structure",
+      "description": "Has title, subtitle/context, main sections, and conclusion"
+    },
+    {
+      "name": "vietnamese_terms",
+      "description": "Vietnamese version uses appropriate Vietnamese technical terms mixed with English where standard"
+    }
+  ]
+}
