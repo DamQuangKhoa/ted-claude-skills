@@ -1,0 +1,6 @@
+{
+  "eval_id": 1,
+  "eval_name": "tailwind-setup",
+  "prompt": "Turn these notes into a blog post about setting up Tailwind CSS in Next.js 15",
+  "assertions": []
+}

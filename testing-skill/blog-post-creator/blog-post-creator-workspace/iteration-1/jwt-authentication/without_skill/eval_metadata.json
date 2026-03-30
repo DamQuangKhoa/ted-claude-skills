@@ -1,0 +1,6 @@
+{
+  "eval_id": 4,
+  "eval_name": "jwt-authentication",
+  "prompt": "Write blog post about JWT authentication from brief bullet points",
+  "assertions": []
+}

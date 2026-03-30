@@ -1,0 +1,35 @@
+{
+  "eval_id": 3,
+  "eval_name": "state-management-comparison",
+  "prompt": "Create comparison blog post for Redux vs Zustand vs Context API",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "guide_style_used",
+      "description": "Uses guide style appropriate for comparison content"
+    },
+    {
+      "name": "has_comparison_tables",
+      "description": "Includes comprehensive comparison tables for all three approaches"
+    },
+    {
+      "name": "has_code_examples",
+      "description": "Contains code examples for Context API, Redux, and Zustand"
+    },
+    {
+      "name": "covers_all_three",
+      "description": "Provides equal coverage for Context API, Redux, and Zustand"
+    },
+    {
+      "name": "has_decision_guide",
+      "description": "Includes guidance on when to use which approach"
+    },
+    {
+      "name": "covers_all_points",
+      "description": "Covers pros/cons, best use cases for each as mentioned in notes"
+    }
+  ]
+}

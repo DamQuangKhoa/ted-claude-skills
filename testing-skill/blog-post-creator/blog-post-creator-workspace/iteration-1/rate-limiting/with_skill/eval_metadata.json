@@ -1,0 +1,35 @@
+{
+  "eval_id": 5,
+  "eval_name": "rate-limiting",
+  "prompt": "Turn detailed outline into blog post about API rate limiting",
+  "assertions": [
+    {
+      "name": "both_versions_exist",
+      "description": "Both Vietnamese and English files are created"
+    },
+    {
+      "name": "preserves_structure",
+      "description": "Maintains the outline structure while enhancing content"
+    },
+    {
+      "name": "has_all_strategies",
+      "description": "Covers all 4 rate limiting strategies: fixed window, sliding window, token bucket, leaky bucket"
+    },
+    {
+      "name": "has_implementation_code",
+      "description": "Includes working implementation examples with Redis and Express"
+    },
+    {
+      "name": "has_comparison_table",
+      "description": "Compares the different strategies with pros/cons"
+    },
+    {
+      "name": "covers_http_headers",
+      "description": "Explains X-RateLimit headers and 429 status code usage"
+    },
+    {
+      "name": "proper_error_handling",
+      "description": "Shows how to handle rate limit violations with proper responses"
+    }
+  ]
+}

@@ -16,7 +16,7 @@ Create pull requests for the LYCC flava-console monorepo via GitHub MCP tools. T
 
 ## JIRA Ticket
 
-[LYCC-XXXX or CLOUDQA-XXXXX or NO-JIRA]
+[Markdown link to Jira — see § JIRA ticket links below]
 
 ## Root Cause
 
@@ -30,6 +30,20 @@ Create pull requests for the LYCC flava-console monorepo via GitHub MCP tools. T
 
 [How to verify the change — manual steps, unit tests, or "N/A" if trivial.]
 ```
+
+### JIRA ticket links (required)
+
+In the **## JIRA Ticket** section, **never** put only a bare ticket key. Always use a **clickable markdown link** to Workers Hub Jira:
+
+- **URL pattern**: `https://jira.workers-hub.com/browse/<TICKET-KEY>`
+- **Markdown**: `[<TICKET-KEY>](https://jira.workers-hub.com/browse/<TICKET-KEY>)`
+
+Examples:
+
+- `LYCC-1234` → `[LYCC-1234](https://jira.workers-hub.com/browse/LYCC-1234)`
+- `CLOUDQA-83859` → `[CLOUDQA-83859](https://jira.workers-hub.com/browse/CLOUDQA-83859)`
+
+If there are **multiple** tickets, use a short list of links (one per line). For **NO-JIRA**, write `NO-JIRA` as plain text (no link).
 
 ## Process
 
@@ -84,7 +98,7 @@ event-bridge, style
 Write each section following the template above. Guidelines:
 
 - **Summary**: Concise — what does this PR accomplish from a user/reviewer perspective?
-- **JIRA Ticket**: One ticket ID. If multiple tickets, list the primary one and mention others in the summary.
+- **JIRA Ticket**: One markdown link per ticket using `https://jira.workers-hub.com/browse/<KEY>` (see **JIRA ticket links** above). Do not leave the key as plain text only.
 - **Root Cause**: Explain _why_ the change is needed. For bug fixes, describe the bug mechanism. For features, describe what gap existed. Omit this section entirely for trivial changes (typos, dependency bumps, config tweaks).
 - **Changes**: Numbered list. Group by area (e.g. "BFF", "Client", or by module). Include file paths when helpful. Each item should be a complete sentence.
 - **Test Plan**: Be specific. "Tested locally" is OK but add details. Reference test commands if relevant (`npm run test`, `npm run test:unit`). For UI changes, describe the manual verification steps.
@@ -110,7 +124,7 @@ If the rebase rewrote commits that were already pushed, you'll need a force push
 
 ### 6. Create the PR via GitHub MCP
 
-Use the `mcp_github_create_pull_request` tool:
+Use the GitHub MCP `create_pull_request` tool (check the tool schema in the MCP descriptors):
 
 - **owner**: parsed from git remote (e.g. `LYCC`)
 - **repo**: parsed from git remote (e.g. `flava-console`)
@@ -136,7 +150,7 @@ Fixes instance list pagination by converting `pageNum`/`pageSize` to `limit`/`of
 
 ## JIRA Ticket
 
-CLOUDQA-83781
+[CLOUDQA-83781](https://jira.workers-hub.com/browse/CLOUDQA-83781)
 
 ## Root Cause
 
