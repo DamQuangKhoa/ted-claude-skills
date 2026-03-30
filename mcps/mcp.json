@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "jira": {
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://npm.linecorp.com",
+        "@linecorp/flava-mcp-connector@latest",
+        "https://jira-noahs.mcp.dev.flava.workers-infra.com/mcp"
+      ],
+      "type": "stdio"
+    },
+    "confluence": {
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://npm.linecorp.com",
+        "@linecorp/flava-mcp-connector@latest",
+        "https://confluence-noahs.mcp.dev.flava.workers-infra.com/mcp"
+      ],
+      "type": "stdio"
+    },
+    "github": {
+      "type": "stdio",
+      "command": "/Users/ted/learn/mcp/github-mcp-server/cmd/github-mcp-server/github-mcp-server",
+      "args": ["stdio"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your github token",
+        "GITHUB_HOST": "https://git.linecorp.com"
+      }
+    }
+  }
+}
