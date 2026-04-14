@@ -1,11 +1,18 @@
 ---
 name: flava-pr-skill
-description: Create pull requests for the LYCC flava-console project using GitHub MCP tools. Use whenever the user asks to "create a PR", "open a PR", "make a pull request", "submit my changes for review", or mentions pushing and creating a pull request — even if they don't explicitly say "GitHub MCP". This skill knows the PR template format, how to extract context from commits and branch names, and how to compose well-structured PR descriptions with Summary, JIRA Ticket, Root Cause, Changes, and Test Plan sections.
+description: Create pull requests for the LYCC flava-console project using GitHub MCP only (create_pull_request). Do not use gh CLI, REST curl, or "open this URL" as the primary create path. Use whenever the user asks to "create a PR", "open a PR", "make a pull request", "submit my changes for review", or mentions pushing and creating a pull request — even if they don't explicitly say "GitHub MCP". This skill knows the PR template format, how to extract context from commits and branch names, and how to compose well-structured PR descriptions with Summary, JIRA Ticket, Root Cause, Changes, and Test Plan sections.
 ---
 
 # Flava PR Skill
 
-Create pull requests for the LYCC flava-console monorepo via GitHub MCP tools. The PR description follows a structured template that gives reviewers clear context on what changed, why, and how to verify.
+Create pull requests for the LYCC flava-console monorepo **using the GitHub MCP `create_pull_request` tool only**. The PR description follows a structured template that gives reviewers clear context on what changed, why, and how to verify.
+
+## PR creation: GitHub MCP only
+
+- **Do** create the PR by calling the **GitHub MCP** tool `create_pull_request` (server typically `user-github`). Read the tool descriptor/schema first so required fields (`owner`, `repo`, `title`, `head`, `base`, optional `body`, `draft`) match the integration.
+- **Do not** use `gh pr create`, generic HTTP calls to the Git API, or ask the user to open the compare URL as the default workflow when MCP is available.
+- **Git push** from the shell is still required before `create_pull_request` (MCP does not push branches). Rebase/push steps in this skill stay the same.
+- If `create_pull_request` fails (auth, connectivity, or tool error), report the error and ask the user how to proceed — do not silently switch to another automation without their OK.
 
 ## PR Description Template
 
@@ -16,7 +23,7 @@ Create pull requests for the LYCC flava-console monorepo via GitHub MCP tools. T
 
 ## JIRA Ticket
 
-[Markdown link to Jira — see § JIRA ticket links below]
+[Markdown link to Jira — see **JIRA ticket links** below]
 
 ## Root Cause
 
@@ -122,9 +129,11 @@ git push origin <branch>
 
 If the rebase rewrote commits that were already pushed, you'll need a force push — ask the user for confirmation before running `git push --force-with-lease origin <branch>`.
 
-### 6. Create the PR via GitHub MCP
+### 6. Create the PR (GitHub MCP only)
 
-Use the GitHub MCP `create_pull_request` tool (check the tool schema in the MCP descriptors):
+Use **only** the GitHub MCP `create_pull_request` tool — see **PR creation: GitHub MCP only** above. Before calling, read the MCP tool schema under your environment’s `mcps/user-github/tools/create_pull_request.json` (or equivalent) for exact parameter names.
+
+Pass:
 
 - **owner**: parsed from git remote (e.g. `LYCC`)
 - **repo**: parsed from git remote (e.g. `flava-console`)
@@ -132,6 +141,7 @@ Use the GitHub MCP `create_pull_request` tool (check the tool schema in the MCP 
 - **body**: the composed PR body (full markdown)
 - **head**: current branch name
 - **base**: `main` (or whatever the user specifies)
+- **draft**: `true` only when the user asked for a draft / WIP PR
 
 ### 7. Confirm to the user
 
