@@ -1,196 +1,187 @@
 ---
 name: weekly-report
-description: Generate professional weekly activity reports from Jira data. Use when users request weekly reports, activity summaries, or work reports covering a specific time period (e.g., "Create report for last week", "Generate my weekly report", "Show what I worked on this week"). Automatically fetches Jira issues updated within the specified period, groups by component/project with **bold** section labels (e.g. **Load balancer**, **SRE**), opens with `# Weekly Activity Report` plus Period and Total Issues lines, then formats each ticket as `**Summary** ([KEY](https://jira.workers-hub.com/browse/KEY))` — human-readable ticket title **bold**, link not bold — followed by accomplishment bullets only (no Backlog/In Progress/Closed status lines). No numbered lists in the report body; no closing Summary section.
+description: Generate weekly activity from Jira in one of two outputs—(1) **Flava product buckets** (default): group headers as Markdown **h3 + bold**, e.g. `### **SRE:**`, `### **Load Balancer:**` (larger type + bold), then task lines `[Category] Short description [KEY](https://jira.workers-hub.com/browse/KEY)`, no leading list markers; (2) **LVN FE3 "This Week"** column—member line `（ Full Name ）`, `*` bullets, same Jira URL base, optional PRs. Use Confluence MCP `confluence_get_page` (LVN / FE 3 - Weekly template) when FE3 rules must be refreshed. No Jira workflow status in task text.
 ---
 
 # Weekly Report Generator
 
-Generate formatted weekly reports from Jira activity data with automatic grouping and professional formatting.
+Build a paste-ready weekly list from **Jira** (`user-jira` / `jira_search`) unless the user supplies tickets manually.
 
-## Workflow
+## Choose output format
 
-When a user requests a report:
+| Format | When to use |
+|--------|-------------|
+| **Flava product buckets** | Group headers use `### **SRE:**` style (Markdown **h3** + **bold** label for larger type); each line ends with `[KEY](https://jira.workers-hub.com/browse/KEY)`. **Default** unless they say "FE3" or "wiki template". |
+| **LVN FE3 "This Week"** | User asks for DEV3 wiki column, `（ Full Name ）`, bullets with Jira URLs, PR links—see [FE 3 - Weekly template](https://wiki.workers-hub.com/pages/viewpage.action?pageId=3999174967); refresh via `confluence_get_page` (`space_key`: `LVN`, `title`: `FE 3 - Weekly template`). |
 
-- **Determine the time period** — Parse the user's request for date range (e.g., "last week", "past 7 days", "from Monday to Friday")
-- **Query Jira** — Use `mcp_jira_jira_search` with JQL to fetch updated issues
-- **Extract and group data** — Organize tickets by component, project, or team
-- **Format the report** — Lead with the **report header** (title, period, issue count), then grouped sections whose names are **bold** (`**SRE**`, `**Load balancer**`, …); one title line per ticket `**Summary** ([KEY](url))` with the issue **title bold** and the parenthesized link in normal weight, then `-` bullets for accomplishments only (no status words); omit a closing Summary section
+---
 
-## Step 1: Determine Time Period
+## Format 1 — Flava product buckets (expected default)
 
-Convert natural language to JQL date format:
+### Rules
 
-- **"Last week"** → `updated >= -7d`
-- **"This week"** → `updated >= startOfWeek()`
-- **"Past X days"** → `updated >= -Xd`
-- **Specific dates** → `updated >= "YYYY-MM-DD" AND updated <= "YYYY-MM-DD"`
+1. **Sections** — One **group header** per section, on its own line: `### **AreaName:**` — Markdown **level-3 heading** (larger font in most viewers) with the **label in bold**, trailing colon inside the bold span. Examples: `### **SRE:**`, `### **Load Balancer:**`, `### **DBS for Cassandra:**`, `### **Vector Search:**`, `### **QA:**`, `### **Flava Console:**`.  
+   - If the user’s paste target does not support Markdown (plain text only), fall back to `**AreaName:**` or plain `AreaName:` and say rendering may be limited.  
+   - For **Confluence** rich editor, pasting Markdown depends on editor mode; equivalent HTML is `<h3><strong>SRE:</strong></h3>` if they need storage format.
+2. **Blank line** — After each group header line, one blank line, then task lines. **No** required blank line between the last task of a section and the next group header (compact paste is OK); optional extra blank between sections if the user prefers.
+3. **Task line** — Single line per issue, **no** leading `*` or `-`. Pattern: `[Category] Human-readable short description [ISSUE-KEY](https://jira.workers-hub.com/browse/ISSUE-KEY)`  
+   - **Jira link is required** for every task. Use base URL `https://jira.workers-hub.com/browse/`; link text **must** match the key (e.g. `[LYCC-9351](https://jira.workers-hub.com/browse/LYCC-9351)`).  
+   - If the user explicitly asks for **bare keys only** (no markdown), omit links for that run only.
+4. **Description** — Short, title-like; trim Jira bracket prefixes such as `[ALB]` when it helps readability (optional). **Do not** append workflow status (*Backlog*, *Closed*, etc.).
+5. **Section order** — Default order (repeat only sections that have ≥1 issue):  
+   `SRE` → `Load Balancer` → `DBS for Cassandra` → `Vector Search` → `QA` → `Flava Console`  
+   Omit empty sections. User may override order or labels.
+6. **Between sections** — Either place the next `### **Area:**` header immediately after the previous section’s last task **or** insert one blank line between sections—match the user’s latest example if they provide one.
 
-If no period specified, default to last 7 days.
+### Bucket mapping (Jira → section)
 
-## Step 2: Query Jira Issues
+Use **components** and **project** first; normalize case/spelling.
 
-Use `mcp_jira_jira_search` with appropriate JQL:
+| Group header (output) | Map when |
+|-------------------------|----------|
+| `### **SRE:**` | `components` contains `SRE`. |
+| `### **Load Balancer:**` | `components` contains `Load balancer` (or team convention "Load Balancer"). |
+| `### **DBS for Cassandra:**` | `components` contains Cassandra / `DBS for Cassandra` / equivalent product name. |
+| `### **Vector Search:**` | `components` contains `Vector search` (or `Vector Search`). |
+| `### **QA:**` | `project` is `CLOUDQA`, or issue is clearly QA-filed work in Cloud QA project. Use `[QA]` category for these lines unless the user says otherwise. |
+| `### **Flava Console:**` | LYCC (or Flava Console) issues that are **not** placed above—e.g. cross-product console features, deployment overview/run history, integrate-API console work **without** a more specific component bucket. If unsure, prefer asking once or using the component the user names. |
 
-```
-jql: "assignee = currentUser() AND updated >= -7d ORDER BY updated DESC"
-fields: "summary,description,issuetype,status,components,updated"
-limit: 50
-```
+If an issue matches multiple rules, use the **most specific** product (e.g. Vector Search before Flava Console).
 
-**JQL patterns:**
-- Current user's work: `assignee = currentUser()`
-- Specific project: `project = PROJ`
-- Specific status: `status IN ('Done', 'Resolved', 'Closed')`
-- Exclude subtasks: `issuetype != Sub-task`
+### Category tags
 
-Adjust the JQL based on user requirements (e.g., specific project, all team activity, completed items only).
+Same semantics as FE3; **one** tag per line:
 
-## Step 3: Extract and Group Data
+| Tag | Use when |
+|-----|----------|
+| `[Feature]` | New capability / user-facing feature |
+| `[Bugfix]` | Defect fix |
+| `[Improvement]` | Refactor, UX polish, performance, API swap |
+| `[Hotfix]` | Urgent prod fix |
+| `[Infra]` | CI/CD, alerts, channels, env, routing |
+| `[Docs]` | Docs / wiki / spec |
+| `[Design]` | Design implementation |
+| `[QA]` | QA-driven items (common for CLOUDQA) |
+| `[Release]` | Release / deploy checklist |
+| `[Discussion]` | Alignment / handover (Slack thread only if user or Jira provides URL) |
 
-From the Jira response, extract:
-- Issue key (e.g., `LYCC-6166`)
-- Summary (title/description)
-- Components (for grouping)
-- Issue type
-- Description field (for details)
+Infer from `issuetype`, `labels`, `components`, `project`, and summary.
 
-**Grouping logic:**
-- First try grouping by **components** field
-- If no components, group by **project key** prefix
-- If user specifies, group by **issue type** or **status**
-
-## Step 4: Format the Report
-
-**Report header (required)** — Put this at the **very top** of the output, before any component sections:
-
-```
-# Weekly Activity Report
-
-Period: March 10–17, 2026   Total Issues: 20
-```
-
-- **Title** — Always use the level-1 heading: `# Weekly Activity Report` (exact wording).
-- **Period** — Human-readable date range that matches the query window you used (same calendar span as the JQL time filter).
-  - For rolling windows (e.g. `updated >= -7d`), use **today’s date** as the report end: period = **inclusive** range covering the last N calendar days (e.g. Mar 24–30, 2026 for a 7-day window ending Mar 30, 2026). If the user’s “last week” means ISO calendar week, use Monday–Sunday or the org’s convention and state it.
-  - For explicit ranges, use `Month D–D, YYYY` (or `Month D, YYYY – Month D, YYYY` across month boundaries). Use an **en dash** (`–`) between day numbers when both fall in the same month.
-- **Total Issues** — Integer count of **issues actually listed** in the report body (after filtering). Must match the number of ticket blocks.
-
-Optional: on the Period line you may separate fields with spaces (as above) or use a middle dot: `Period: … · Total Issues: N`.
-
-Then a **blank line**, then the first grouping section.
-
-**Jira ticket links (required):** Whenever you name an issue key, use a markdown link. Base URL is `https://jira.workers-hub.com/browse/`. The path segment must use the **same** key as link text (no mismatched keys).
-
-Examples:
-
-- `[LYCC-1234](https://jira.workers-hub.com/browse/LYCC-1234)`
-- `[CLOUDQA-83167](https://jira.workers-hub.com/browse/CLOUDQA-83167)`
-
-Put the key inside **parentheses** on the **title line** as a markdown link (same key in URL). Do not use a bare key in parentheses without a link on that line.
-
-**Per-ticket shape (required):**
-
-- **Title line** — no leading `-`. Pattern: `**Short Jira summary as title** ([KEY](https://jira.workers-hub.com/browse/KEY))`  
-  - Wrap the **entire human-readable ticket name** (from the issue **summary**) in `**...**`. Leave a space before the opening parenthesis; keep `([KEY](url))` in **normal** weight (not inside the bold span).  
-  - Derive the title from the issue **summary** (edit slightly for readability if needed; keep meaning).
-  - Do **not** use `Title: [link]`, colons before the key, or a separate line for the link; merge into this single title line.
-
-- **Detail lines** — only `-` bullets **under** that title, describing work and outcomes (features fixed, APIs changed, fields added, behavior improved).
-  - Use **2–4 bullets** when possible; fewer is OK if the issue is thin.
-  - **Do not** mention Jira workflow state: no *Backlog*, *In Progress*, *In Review*, *Closed*, *Resolved*, or lines like “Ticket still in …”.
-  - For items not yet delivered, write what is **planned**, **scoped**, or **being worked on** in neutral language (still no status keywords).
-
-Use a **blank line** between one ticket block (title + its bullets) and the next.
-
-**Section header:** `**Group label** - X tickets` then a blank line, then ticket blocks.  
-- **Bold** the whole group label (component, project bucket, or synthetic section name) using markdown `**...**` — e.g. **Load balancer** - 8 tickets, **SRE** - 4 tickets, **Cloud QA** - 3 tickets.  
-- Keep the trailing ` - N tickets` part in regular weight unless the user asks otherwise.
-
-**Do not** use ordered lists (`1.`, `2.`, …) anywhere in the report body.
-
-**Do not** add a closing **Summary** section. Grouped sections are the full deliverable.
-
-**Example (target style):**
+### Example (target shape)
 
 ```
-# Weekly Activity Report
+### **SRE:**
 
-Period: March 10–17, 2026   Total Issues: 3
+[Infra] Alert noise reduction for window.ya [LYCC-9351](https://jira.workers-hub.com/browse/LYCC-9351)
+[Infra] Separate IMON and Sentry alert channels [LYCC-9841](https://jira.workers-hub.com/browse/LYCC-9841)
 
-**Load balancer** - 2 tickets
+### **Load Balancer:**
 
-**Request Quota API Enhancement** ([LYCC-9594](https://jira.workers-hub.com/browse/LYCC-9594))
-- Added current quota fields to request quota API response
-- New fields: cpu_old, memory_old, block_storage_old
+[Feature] Add OpenSearch tab in overview [LYCC-9844](https://jira.workers-hub.com/browse/LYCC-9844)
+[Improvement] Change to BE API for ALB list [LYCC-8687](https://jira.workers-hub.com/browse/LYCC-8687)
 
-**Fixed routing rules validation on UI** ([LYCC-6166](https://jira.workers-hub.com/browse/LYCC-6166))
-- Corrected rule handling in the routing-rules UI flow
-- Validation now matches expected routing rule behavior
+### **QA:**
 
-**Application Load Balancer (ALB)** - 6 tickets
-
-**Changed upper limit for upstream/downstream timeout** ([LYCC-6109](https://jira.workers-hub.com/browse/LYCC-6109))
-- Raised maximum timeout limits for upstream and downstream connections
-- Aligned configuration with new latency requirements
+[QA] Status shows Unknown during upgrade [CLOUDQA-83888](https://jira.workers-hub.com/browse/CLOUDQA-83888)
 ```
 
-## Customization Options
+**Do not** use numbered lists in the body. **Do not** add a trailing "Summary" section.
 
-Users may request variations:
+### Golden example (team shape — grouping + Jira links)
 
-**Different grouping:**
-- "Group by status" → Group tickets by current status
-- "Group by type" → Group by issue type (Bug, Feature, Task)
-- "Don't group" → Simple bullet list with Jira links per ticket
+Use this as the structural reference when the user asks for the "Flava bucket" weekly list (wording may change per sprint; **shape** must match). **Every** line ends with `[KEY](https://jira.workers-hub.com/browse/KEY)`.
 
-**Different filtering:**
-- "Only completed tickets" → Add `status IN ('Done', 'Resolved', 'Closed')` to JQL
-- "Include all team" → Remove `assignee = currentUser()` from JQL
-- "Project X only" → Add `project = X` to JQL
+```
+### **SRE:**
 
-**Different format:**
-- "Brief format" → Show only summary and ticket ID
-- "Detailed format" → Include more description details
-- "Bullet list" → Default format; still include Jira links for each ticket
+[Infra] Alert noise reduction for window.ya [LYCC-9351](https://jira.workers-hub.com/browse/LYCC-9351)
+[Infra] Separate IMON and Sentry alert channels [LYCC-9841](https://jira.workers-hub.com/browse/LYCC-9841)
+[Infra] Separate Prod and Dev alert channels [LYCC-9796](https://jira.workers-hub.com/browse/LYCC-9796)
+[Infra] Deliver IMON and Sentry channel routing [LYCC-9840](https://jira.workers-hub.com/browse/LYCC-9840)
+### **Load Balancer:**
 
-## Tips for Best Results
+[Feature] Monitoring metric attributes [LYCC-9885](https://jira.workers-hub.com/browse/LYCC-9885)
+[Feature] Add OpenSearch tab in overview [LYCC-9844](https://jira.workers-hub.com/browse/LYCC-9844)
+[Improvement] Change to BE API for ALB list [LYCC-8687](https://jira.workers-hub.com/browse/LYCC-8687)
+[Improvement] Remove General view from ALB edit [LYCC-8466](https://jira.workers-hub.com/browse/LYCC-8466)
+[Feature] Add VPC selection for NLB/ALB [LYCC-9774](https://jira.workers-hub.com/browse/LYCC-9774)
+[Feature] Add "Managed by" column to ALB list [LYCC-7983](https://jira.workers-hub.com/browse/LYCC-7983)
+[Feature] Multiple products in "Managed by" on LB list [LYCC-9650](https://jira.workers-hub.com/browse/LYCC-9650)
+[Improvement] Change to BE API for NLB list [LYCC-8686](https://jira.workers-hub.com/browse/LYCC-8686)
+### **DBS for Cassandra:**
 
-- **Default to current user**: Unless specified, fetch the current user's activity
-- **Reasonable limits**: Default to 50 tickets max; ask if more are needed
-- **Handle missing data**: If tickets lack components, fall back to project grouping
-- **Parse descriptions intelligently**: Extract key accomplishments from description field
-- **Professional tone**: Outcome-focused bullets; ticket title on the title line is `**bold**` then `([KEY](url))` in normal weight; never echo Jira status columns; header always includes period + total issue count; group lines use **bold** for the component/project name; no trailing Summary block
+[Feature] Monitoring metric attributes [LYCC-9884](https://jira.workers-hub.com/browse/LYCC-9884)
+### **Vector Search:**
+
+[Feature] Add sparse encoding features [LYCC-9200](https://jira.workers-hub.com/browse/LYCC-9200)
+### **QA:**
+
+[QA] ALB list pagination incorrect [CLOUDQA-83822](https://jira.workers-hub.com/browse/CLOUDQA-83822)
+[QA] NLB list pagination incorrect [CLOUDQA-83824](https://jira.workers-hub.com/browse/CLOUDQA-83824)
+[QA] Field type for index template in pipeline [CLOUDQA-77248](https://jira.workers-hub.com/browse/CLOUDQA-77248)
+[QA] Hide Approval from Vector Search in Prod [CLOUDQA-83167](https://jira.workers-hub.com/browse/CLOUDQA-83167)
+[QA] Default not shown for Fixed char length [CLOUDQA-84098](https://jira.workers-hub.com/browse/CLOUDQA-84098)
+[QA] Status not Deleting on lifetime end service [CLOUDQA-84099](https://jira.workers-hub.com/browse/CLOUDQA-84099)
+[QA] Algorithm change fails after engine upgrade [CLOUDQA-84074](https://jira.workers-hub.com/browse/CLOUDQA-84074)
+[QA] Missing Text embedding notice on pipeline [CLOUDQA-83862](https://jira.workers-hub.com/browse/CLOUDQA-83862)
+[QA] ML model list empty when no models deployed [CLOUDQA-84073](https://jira.workers-hub.com/browse/CLOUDQA-84073)
+[QA] Status shows Unknown during upgrade [CLOUDQA-83888](https://jira.workers-hub.com/browse/CLOUDQA-83888)
+[QA] ML model label for system model ID [CLOUDQA-83869](https://jira.workers-hub.com/browse/CLOUDQA-83869)
+[QA] Tooltip for system model ID [CLOUDQA-83868](https://jira.workers-hub.com/browse/CLOUDQA-83868)
+[QA] Register model engine version format [CLOUDQA-83860](https://jira.workers-hub.com/browse/CLOUDQA-83860)
+[QA] ML model catalog engine version filter [CLOUDQA-83859](https://jira.workers-hub.com/browse/CLOUDQA-83859)
+### **Flava Console:**
+
+[Feature] Deployment Run History detail view [LYCC-9765](https://jira.workers-hub.com/browse/LYCC-9765)
+[Feature] Deployment Overview page [LYCC-9237](https://jira.workers-hub.com/browse/LYCC-9237)
+```
+
+Note: In real runs, only include tickets returned by JQL for the chosen period and assignee; omit sections with zero rows. The golden sample uses **no** blank line between the last task line and the following group header.
+
+---
+
+## Format 2 — LVN FE3 "This Week" column
+
+When the user asks for the wiki column format:
+
+- Re-read rules from Confluence: `confluence_get_page` (`user-confluence`), `space_key`: `LVN`, `title`: `FE 3 - Weekly template`.
+- **Member line:** `（ Full Name ）` — full-width parentheses, single space inside.
+- **Tasks:** `* [Category] Text [KEY](https://jira.workers-hub.com/browse/KEY)`; optional `, [PR-N](url)`; `+` sub-lines for Discussion Slack threads.
+- **No activity:** `* No activity this week` under the member line.
+
+---
+
+## Workflow (both formats)
+
+1. **Time period** — "Last week" → default `updated >= -7d`; or explicit dates; or `startOfWeek()` for "this week".
+2. **Query** — `jira_search`: default `assignee = currentUser() AND updated >= -7d ORDER BY updated DESC`, `fields` include `summary,description,issuetype,status,components,updated,project,labels,assignee`, `limit` 50 (paginate if needed).
+3. **Group** — Format 1: assign each issue to a **bucket** (table above). Format 2: optional component grouping or flat list per FE3.
+4. **Emit** — Follow the chosen format exactly (Format 1: `### **Group:**` headers + Jira links on every task line unless bare keys requested; Format 2: member line + bullets).
+
+## JQL reference
+
+- Current user: `assignee = currentUser()`
+- Done only: `status IN ('Done', 'Resolved', 'Closed')`
+- Team: broaden assignee or drop filter
+- Project: `project in (LYCC, CLOUDQA)`
+
+## Tips
+
+- **Format 1 default:** group titles as `### **Name:**` (bigger + bold); always append `[KEY](https://jira.workers-hub.com/browse/KEY)` so viewers render clickable tickets. Use bare keys only when the user says so.
+- **LYCC-9840**-style rows appear when the user tracks related delivery; include only if it appears in the Jira result set for the window and assignee filter.
+- Never invent PR URLs or Slack threads.
 
 ### scripts/
-Executable code (Python/Bash/etc.) that can be run directly to perform specific operations.
 
-**Examples from other skills:**
-- PDF skill: `fill_fillable_fields.py`, `extract_form_field_info.py` - utilities for PDF manipulation
-- DOCX skill: `document.py`, `utilities.py` - Python modules for document processing
-
-**Appropriate for:** Python scripts, shell scripts, or any executable code that performs automation, data processing, or specific operations.
-
-**Note:** Scripts may be executed without loading into context, but can still be read by Claude for patching or environment adjustments.
+Optional helpers in `scripts/` if you add automation.
 
 ### references/
-Documentation and reference material intended to be loaded into context to inform Claude's process and thinking.
 
-**Examples from other skills:**
-- Product management: `communication.md`, `context_building.md` - detailed workflow guides
-- BigQuery: API reference documentation and query examples
-- Finance: Schema documentation, company policies
-
-**Appropriate for:** In-depth documentation, API references, database schemas, comprehensive guides, or any detailed information that Claude should reference while working.
+- [FE 3 - Weekly template](https://wiki.workers-hub.com/pages/viewpage.action?pageId=3999174967) (LVN).
 
 ### assets/
-Files not intended to be loaded into context, but rather used within the output Claude produces.
 
-**Examples from other skills:**
-- Brand styling: PowerPoint template files (.pptx), logo files
-- Frontend builder: HTML/React boilerplate project directories
-- Typography: Font files (.ttf, .woff2)
-
-**Appropriate for:** Templates, boilerplate code, document templates, images, icons, fonts, or any files meant to be copied or used in the final output.
+None required.
 
 ---
 
