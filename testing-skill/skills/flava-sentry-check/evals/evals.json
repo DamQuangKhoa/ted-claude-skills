@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-sentry-check",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Look at Sentry issue FLAVA-CONSOLE-SHELL-CLIENT-56 for org ly: what’s failing, trace it in flava-console, and give me a fix plan—but don’t edit code.",
+      "expected_output": "MCP verified; get_sentry_resource/list_issue_events used; codebase mapping (likely shell/project route); RCA; numbered plan + todos; no file edits.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Here’s the link https://ly.my.sentry.io/organizations/ly/issues/FLAVA-CONSOLE-VECTOR-SEARCH-CLIENT-1/ — tell me root cause + how to patch vector-search FE.",
+      "expected_output": "Uses issue URL with get_sentry_resource or equivalent; correlates slug to apps/product-dbs-for-vector-search (or actual owner); RCA + scoped plan.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Sentry MCP is broken on my laptop—still explain why FLAVA-CONSOLE-SHELL-1 is crashing.",
+      "expected_output": "Refuses invented trace; cites FE3 Sentry Integration Guide wiki URL; asks to configure MCP before claiming RCA.",
+      "files": []
+    }
+  ]
+}

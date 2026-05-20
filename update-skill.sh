@@ -112,6 +112,7 @@ sync_flava_pair() {
 
 sync_flava_pair "flava-commit-skill"
 sync_flava_pair "flava-jira-check"
+sync_flava_pair "flava-jira-speckit-check"
 sync_flava_pair "flava-jira-create-sre-ticket"
 sync_flava_pair "flava-pr-skill"
 sync_flava_pair "flava-weekly-report"

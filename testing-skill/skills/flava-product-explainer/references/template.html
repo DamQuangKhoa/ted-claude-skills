@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vector Search as a Service — Tổng quan sản phẩm</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --primary-bg: #eef2ff;
+      --accent: #06b6d4;
+      --accent-bg: #ecfeff;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --card-bg: #ffffff;
+      --bg: #f8fafc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #0891b2 100%);
+      color: white;
+      padding: 60px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 30%, rgba(6,182,212,.25) 0%, transparent 60%);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .hero h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; margin-bottom: 12px; position: relative; }
+    .hero p  { font-size: 16px; opacity: .85; max-width: 580px; margin: 0 auto 32px; position: relative; }
+    .hero-stats {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 32px;
+      position: relative;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 32px; font-weight: 800; }
+    .hero-stat .lbl { font-size: 12px; opacity: .7; }
+
+    /* ── Nav Tabs ── */
+    .nav-wrap {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 8px rgba(0,0,0,.06);
+    }
+    .nav {
+      display: flex; gap: 4px;
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 24px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav::-webkit-scrollbar { display: none; }
+    .nav-btn {
+      padding: 14px 20px;
+      font-size: 14px; font-weight: 600;
+      color: var(--text-secondary);
+      border: none; background: none; cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all .2s;
+    }
+    .nav-btn:hover { color: var(--primary); }
+    .nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* ── Layout ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 24px; font-weight: 800; margin-bottom: 6px; color: var(--text);
+    }
+    .section-subtitle { color: var(--text-secondary); margin-bottom: 32px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+
+    .card-icon { font-size: 36px; margin-bottom: 12px; }
+    .card h3  { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .card p   { font-size: 14px; color: var(--text-secondary); }
+
+    /* ── Highlight card ── */
+    .card-highlight {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, #eef2ff 0%, #f0fdff 100%);
+    }
+
+    /* ── Tag / badge ── */
+    .tag {
+      display: inline-block;
+      padding: 2px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 600; letter-spacing: .4px;
+    }
+    .tag-blue  { background: var(--primary-bg); color: var(--primary); }
+    .tag-cyan  { background: var(--accent-bg);  color: var(--accent); }
+    .tag-green { background: #d1fae5; color: #065f46; }
+    .tag-amber { background: #fef3c7; color: #92400e; }
+    .tag-red   { background: #fee2e2; color: #991b1b; }
+
+    /* ── Persona cards ── */
+    .persona-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .persona {
+      border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; background: white;
+      cursor: pointer; transition: all .2s;
+    }
+    .persona.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-bg);
+    }
+    .persona-avatar { font-size: 48px; margin-bottom: 12px; }
+    .persona h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .persona .role { font-size: 12px; color: var(--text-secondary); margin-bottom: 12px; }
+    .persona-detail {
+      max-height: 0; overflow: hidden; transition: max-height .4s ease;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .persona.selected .persona-detail { max-height: 300px; }
+
+    /* ── Problem/Solution ── */
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width:640px){ .ps-grid { grid-template-columns: 1fr; } }
+    .ps-card { border-radius: 16px; padding: 24px; }
+    .ps-card.problem { background: #fff1f2; border: 1px solid #fecdd3; }
+    .ps-card.solution { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .ps-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+    .ps-card ul { list-style: none; }
+    .ps-card ul li { font-size: 13px; padding: 6px 0; display: flex; gap: 8px; align-items: flex-start; }
+
+    /* ── Journey / flow ── */
+    .journey {
+      display: flex; gap: 0; overflow-x: auto; padding-bottom: 8px;
+      scrollbar-width: thin;
+    }
+    .journey-step {
+      flex: 0 0 155px;
+      border: 1px solid var(--border); border-radius: 12px;
+      background: white; padding: 16px; cursor: pointer;
+      position: relative; transition: all .2s;
+    }
+    .journey-step + .journey-step::before {
+      content: '→';
+      position: absolute; left: -18px; top: 50%; transform: translateY(-50%);
+      color: var(--text-secondary); font-size: 18px;
+    }
+    .journey-step:hover, .journey-step.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-bg);
+    }
+    .journey-step.active { background: var(--primary-bg); }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
+    .journey-step .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary); color: white;
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    .journey-step h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .journey-step p  { font-size: 11px; color: var(--text-secondary); }
+
+    /* ── Journey detail (WHAT/WHEN/WHY/HOW) ── */
+    .journey-detail {
+      margin-top: 20px; border-radius: 16px; overflow: hidden;
+      border: 1px solid #c7d2fe; animation: fadeIn .3s;
+    }
+    .jd-header {
+      background: linear-gradient(135deg, var(--primary) 0%, #0891b2 100%);
+      color: white; padding: 18px 24px;
+    }
+    .jd-header h3 { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+    .jd-header p  { font-size: 13px; opacity: .85; }
+    .jd-body { background: white; padding: 24px; }
+    .jd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .jd-card { border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+    .jd-card.what  { background: #eef2ff; border-color: #c7d2fe; }
+    .jd-card.when  { background: #ecfeff; border-color: #a5f3fc; }
+    .jd-card.why   { background: #fef3c7; border-color: #fde68a; }
+    .jd-card.how   { background: #f0fdf4; border-color: #bbf7d0; }
+    .jd-card-label {
+      font-size: 11px; font-weight: 800; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .jd-card.what .jd-card-label { color: var(--primary); }
+    .jd-card.when .jd-card-label { color: #0e7490; }
+    .jd-card.why  .jd-card-label { color: #92400e; }
+    .jd-card.how  .jd-card-label { color: #065f46; }
+    .jd-card-body { font-size: 13px; color: var(--text); line-height: 1.65; }
+    .jd-card-body ul { padding-left: 16px; margin-top: 4px; }
+    .jd-card-body ul li { margin-bottom: 4px; }
+    .jd-tip {
+      margin-top: 16px; padding: 12px 16px;
+      background: #f8fafc; border-left: 4px solid var(--primary);
+      border-radius: 0 8px 8px 0; font-size: 13px; color: var(--text-secondary);
+    }
+
+    /* ── Feature accordion ── */
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-item {
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      background: white;
+    }
+    .feature-header {
+      padding: 16px 20px; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 15px; user-select: none;
+      transition: background .2s;
+    }
+    .feature-header:hover { background: var(--bg); }
+    .feature-header.open { color: var(--primary); }
+    .feature-arrow { transition: transform .3s; font-size: 12px; }
+    .feature-header.open .feature-arrow { transform: rotate(180deg); }
+    .feature-body {
+      max-height: 0; overflow: hidden; transition: max-height .4s ease;
+      font-size: 14px; color: var(--text-secondary);
+    }
+    .feature-body.open { max-height: 400px; }
+    .feature-body-inner { padding: 0 20px 20px; }
+    .feature-body ul { padding-left: 18px; }
+    .feature-body ul li { margin-bottom: 6px; }
+
+    /* ── Value metrics ── */
+    .metric-card {
+      border-radius: 16px; padding: 24px; text-align: center;
+      border: 1px solid var(--border); background: white;
+    }
+    .metric-card .big { font-size: 40px; font-weight: 800; }
+    .metric-card .label { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .metric-card.blue  .big { color: var(--primary); }
+    .metric-card.cyan  .big { color: var(--accent); }
+    .metric-card.green .big { color: var(--success); }
+    .metric-card.amber .big { color: var(--warning); }
+
+    /* ── Pricing model ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .pricing-card {
+      border: 2px solid var(--border); border-radius: 16px;
+      background: white; padding: 24px; text-align: center;
+      transition: all .2s;
+    }
+    .pricing-card.featured {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: white;
+    }
+    .pricing-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .pricing-card .price { font-size: 28px; font-weight: 800; margin: 12px 0; }
+    .pricing-card .price span { font-size: 14px; font-weight: 400; }
+    .pricing-card ul { list-style: none; text-align: left; }
+    .pricing-card ul li { padding: 5px 0; font-size: 13px; display: flex; gap: 8px; }
+    .pricing-card.featured ul li { color: rgba(255,255,255,.85); }
+
+    /* ── Comparison table ── */
+    .compare-table { width: 100%; border-collapse: collapse; border-radius: 12px; overflow: hidden; }
+    .compare-table th, .compare-table td { padding: 12px 16px; text-align: left; font-size: 14px; }
+    .compare-table th { background: var(--primary); color: white; font-weight: 700; }
+    .compare-table tr:nth-child(even) td { background: #f8fafc; }
+    .compare-table td:first-child { font-weight: 600; }
+    .check { color: var(--success); font-size: 16px; }
+    .cross { color: var(--danger); font-size: 16px; }
+
+    /* ── Quiz ── */
+    .quiz-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+    .quiz-q { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-opt {
+      padding: 12px 18px; border-radius: 10px; border: 2px solid var(--border);
+      cursor: pointer; font-size: 14px; text-align: left; background: white;
+      transition: all .2s;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-bg); }
+    .quiz-opt.correct { border-color: var(--success); background: #f0fdf4; }
+    .quiz-opt.wrong   { border-color: var(--danger);  background: #fff1f2; }
+    .quiz-feedback {
+      margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+      font-size: 14px; display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.ok { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+    .quiz-feedback.ko { background: #fff1f2; color: #991b1b; border: 1px solid #fecdd3; }
+    .quiz-next {
+      margin-top: 16px; padding: 10px 24px; border-radius: 999px;
+      background: var(--primary); color: white; border: none; cursor: pointer;
+      font-weight: 600; font-size: 14px; display: none;
+    }
+    .quiz-next.show { display: inline-block; }
+    .quiz-score {
+      text-align: center; padding: 32px; display: none;
+    }
+    .quiz-score.show { display: block; }
+    .quiz-score .score-num { font-size: 64px; font-weight: 800; color: var(--primary); }
+    .quiz-score p { color: var(--text-secondary); margin-top: 8px; }
+    .quiz-restart {
+      margin-top: 20px; padding: 12px 32px; border-radius: 999px;
+      background: var(--primary); color: white; border: none; cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* ── Progress bar (quiz) ── */
+    .quiz-progress { display: flex; gap: 4px; margin-bottom: 20px; }
+    .quiz-pip {
+      flex: 1; height: 6px; border-radius: 3px; background: var(--border);
+      transition: background .3s;
+    }
+    .quiz-pip.done { background: var(--primary); }
+    .quiz-pip.current { background: var(--primary-light); }
+
+    /* ── Real-world walkthrough ── */
+    .rw-scenario {
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #1e1b4b 0%, #0c4a6e 100%);
+      border-radius: 16px; color: white;
+      margin-bottom: 24px;
+      display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+    }
+    .rw-scenario-logo { font-size: 48px; }
+    .rw-scenario-info h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .rw-scenario-info p  { font-size: 14px; opacity: .8; }
+    .rw-scenario-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .rw-scenario-tag {
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+    }
+
+    .rw-timeline { display: flex; flex-direction: column; }
+    .rw-phase { border: 1px solid var(--border); background: white; overflow: hidden; }
+    .rw-phase:first-child { border-radius: 12px 12px 0 0; }
+    .rw-phase:last-child  { border-radius: 0 0 12px 12px; }
+    .rw-phase + .rw-phase { border-top: none; }
+    .rw-phase-header {
+      padding: 16px 20px; cursor: pointer;
+      display: flex; gap: 14px; align-items: center;
+      transition: background .2s;
+    }
+    .rw-phase-header:hover { background: var(--bg); }
+    .rw-phase-header.open  { background: var(--primary-bg); }
+    .rw-phase-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: white;
+      font-weight: 800; font-size: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .rw-phase-title { font-weight: 700; font-size: 15px; flex: 1; }
+    .rw-phase-meta  { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .rw-phase-time {
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      background: var(--bg); padding: 2px 8px; border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+    .rw-phase-arrow { font-size: 11px; color: var(--text-secondary); transition: transform .3s; }
+    .rw-phase-header.open .rw-phase-arrow { transform: rotate(180deg); }
+    .rw-phase-body { max-height: 0; overflow: hidden; transition: max-height .5s ease; }
+    .rw-phase-body.open { max-height: 1400px; }
+    .rw-phase-inner { padding: 0 20px 24px; }
+
+    .code-block {
+      background: #0f172a; border-radius: 10px;
+      padding: 16px; overflow-x: auto; margin: 10px 0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px; line-height: 1.75; color: #e2e8f0;
+    }
+    .code-block .cm { color: #64748b; }
+    .code-block .ck { color: #93c5fd; }
+    .code-block .cv { color: #86efac; }
+    .code-block .cn { color: #fca5a5; }
+    .code-block .cc { color: #c084fc; font-weight: 700; }
+
+    .rw-config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px; margin: 12px 0;
+    }
+    .rw-config-item {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .cfg-lbl { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .cfg-val { font-size: 13px; font-weight: 600; }
+
+    .rw-phase-callout {
+      margin-top: 12px; padding: 10px 14px;
+      background: var(--primary-bg);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      font-size: 13px; color: var(--text-secondary);
+    }
+
+    .rw-result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    @media(max-width:600px) { .rw-result-grid { grid-template-columns: 1fr; } }
+    .rw-result-before { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; padding: 16px; }
+    .rw-result-after  { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; }
+    .rw-result-before h4 { color: #991b1b; font-size: 14px; margin-bottom: 10px; }
+    .rw-result-after  h4 { color: #166534; font-size: 14px; margin-bottom: 10px; }
+    .rw-sr {
+      background: white; border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; font-size: 13px;
+    }
+    .rw-sr-name  { font-weight: 700; }
+    .rw-sr-score { float: right; font-size: 11px; color: var(--text-secondary); }
+    .rw-sr-match { font-size: 11px; color: var(--success); margin-top: 3px; }
+
+    .rw-summary {
+      margin-top: 28px;
+      background: linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%);
+      border: 1px solid #c7d2fe; border-radius: 16px; padding: 24px;
+    }
+    .rw-summary h3 { font-size: 18px; font-weight: 800; margin-bottom: 16px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+    /* ── Responsive ── */
+    @media(max-width:700px){
+      .hero { padding: 40px 16px 60px; }
+      .container { padding: 24px 16px; }
+      .nav-btn { padding: 12px 14px; font-size: 13px; }
+      .journey-step { flex: 0 0 180px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="hero">
+  <div class="hero-badge">Flava Cloud · Vector Search as a Service</div>
+  <h1>🔍 Vector Search</h1>
+  <p>Dịch vụ tìm kiếm thông minh trên nền tảng đám mây — giúp ứng dụng của bạn hiểu ngữ nghĩa, không chỉ từ khóa.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">~3 phút</div><div class="lbl">Tạo cluster xong</div></div>
+    <div class="hero-stat"><div class="num">Fully managed</div><div class="lbl">Không cần ops</div></div>
+    <div class="hero-stat"><div class="num">OpenSearch</div><div class="lbl">Powered by</div></div>
+    <div class="hero-stat"><div class="num">Flava Cloud</div><div class="lbl">Chạy trên</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<div class="nav-wrap">
+  <nav class="nav" role="tablist">
+    <button class="nav-btn active" onclick="showSection('intro',this)">💡 Tổng quan</button>
+    <button class="nav-btn" onclick="showSection('persona',this)">👤 Đối tượng</button>
+    <button class="nav-btn" onclick="showSection('problem',this)">⚡ Vấn đề & Giải pháp</button>
+    <button class="nav-btn" onclick="showSection('journey',this)">🗺️ Hành trình</button>
+    <button class="nav-btn" onclick="showSection('features',this)">🚀 Tính năng</button>
+    <button class="nav-btn" onclick="showSection('value',this)">💎 Giá trị</button>
+    <button class="nav-btn" onclick="showSection('compare',this)">⚖️ So sánh</button>
+    <button class="nav-btn" onclick="showSection('realworld',this)">🌍 Thực tế</button>
+    <button class="nav-btn" onclick="showSection('quiz',this)">🧠 Kiểm tra</button>
+  </nav>
+</div>
+
+<!-- ═══════════════════ SECTIONS ═══════════════════ -->
+<div class="container">
+
+  <!-- ── 1. TỔNG QUAN ── -->
+  <section id="intro" class="section active">
+    <div class="section-title">Vector Search là gì?</div>
+    <p class="section-subtitle">Một dịch vụ tìm kiếm thế hệ mới — thay vì tìm theo từ khóa, nó hiểu được ý nghĩa.</p>
+
+    <div style="margin-bottom:32px; padding:24px; background:linear-gradient(135deg,#eef2ff,#ecfeff); border-radius:16px; border:1px solid #c7d2fe;">
+      <div style="font-size:20px; font-weight:800; margin-bottom:12px;">🌟 Ví dụ thực tế</div>
+      <p style="font-size:15px; margin-bottom:16px;">Người dùng gõ: <strong>"áo mùa hè mát mẻ"</strong> → Tìm kiếm từ khóa thông thường <span style="color:#ef4444;">không tìm ra</span> sản phẩm có tên "Cotton Tank Top".<br>
+      Vector Search <span style="color:#10b981; font-weight:700;">hiểu ngữ nghĩa</span> và trả về đúng sản phẩm phù hợp ✅</p>
+      <div style="display:flex; gap:16px; flex-wrap:wrap;">
+        <div style="padding:12px 18px; background:white; border-radius:10px; border:1px solid #fecdd3; flex:1; min-width:200px;">
+          <div style="font-size:12px; color:#ef4444; font-weight:700; margin-bottom:4px;">❌ Tìm kiếm cũ (Keyword)</div>
+          <div style="font-size:13px;">Chỉ so khớp chính xác từng chữ cái</div>
+        </div>
+        <div style="padding:12px 18px; background:white; border-radius:10px; border:1px solid #bbf7d0; flex:1; min-width:200px;">
+          <div style="font-size:12px; color:#10b981; font-weight:700; margin-bottom:4px;">✅ Vector Search</div>
+          <div style="font-size:13px;">Hiểu ý nghĩa, tìm sản phẩm <em>tương đồng về nghĩa</em></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:32px;">
+      <div class="card card-highlight">
+        <div class="card-icon">🛒</div>
+        <h3>E-commerce</h3>
+        <p>Gợi ý sản phẩm tương tự, tìm kiếm theo hình ảnh, hỗ trợ tìm theo mô tả tự nhiên.</p>
+        <div style="margin-top:10px;"><span class="tag tag-blue">Semantic Search</span></div>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-icon">🤖</div>
+        <h3>AI Chatbot (RAG)</h3>
+        <p>Chatbot có thể truy vấn kiến thức doanh nghiệp chính xác, không "hallucinate".</p>
+        <div style="margin-top:10px;"><span class="tag tag-cyan">RAG / AI</span></div>
+      </div>
+      <div class="card card-highlight">
+        <div class="card-icon">📄</div>
+        <h3>Document Search</h3>
+        <p>Tìm tài liệu, hợp đồng, báo cáo nội bộ theo ý nghĩa — không cần nhớ từ khóa chính xác.</p>
+        <div style="margin-top:10px;"><span class="tag tag-green">Enterprise</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:16px;">🔄 Vector là gì? (Giải thích đơn giản)</h3>
+      <div style="display:flex; flex-direction:column; gap:12px; font-size:14px;">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:28px; height:28px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; flex-shrink:0;">1</div>
+          <div><strong>Văn bản → Số (Vector):</strong> AI model chuyển câu chữ thành dãy số đại diện cho <em>ý nghĩa</em>. "Con mèo" và "Kitty" → 2 dãy số rất gần nhau.</div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:28px; height:28px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; flex-shrink:0;">2</div>
+          <div><strong>Lưu Vector:</strong> Hàng triệu vector được lưu vào Vector Search database với cấu trúc tối ưu cho tìm kiếm nhanh.</div>
+        </div>
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+          <div style="width:28px; height:28px; background:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; flex-shrink:0;">3</div>
+          <div><strong>Tìm kiếm:</strong> Câu hỏi của user → chuyển thành vector → tìm vector <em>gần nhất</em> trong database → trả về kết quả phù hợp nhất.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. ĐỐI TƯỢNG ── -->
+  <section id="persona" class="section">
+    <div class="section-title">Ai sử dụng Vector Search?</div>
+    <p class="section-subtitle">Nhấn vào từng đối tượng để xem chi tiết nhu cầu và lợi ích.</p>
+
+    <div class="persona-grid">
+      <div class="persona" onclick="togglePersona(this)">
+        <div class="persona-avatar">👨‍💻</div>
+        <h3>Developer / Tech Lead</h3>
+        <div class="role">Kỹ sư phần mềm xây dựng sản phẩm AI</div>
+        <div class="tag tag-blue" style="margin-bottom:12px;">Kỹ thuật</div>
+        <div class="persona-detail">
+          <strong>Nhu cầu:</strong>
+          <ul style="margin:8px 0 0 16px; font-size:13px;">
+            <li>Tích hợp AI Search nhanh vào app</li>
+            <li>Không muốn quản lý infrastructure OpenSearch</li>
+            <li>API đơn giản, documentation rõ ràng</li>
+            <li>Scale tự động khi traffic tăng</li>
+          </ul>
+          <div style="margin-top:10px;"><strong>Lợi ích từ Vector Search:</strong></div>
+          <ul style="margin:6px 0 0 16px; font-size:13px;">
+            <li>✅ Cluster sẵn trong vài phút</li>
+            <li>✅ Không cần DevOps</li>
+            <li>✅ Tích hợp pipeline ML model trực tiếp</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="persona" onclick="togglePersona(this)">
+        <div class="persona-avatar">👩‍💼</div>
+        <h3>Product Manager</h3>
+        <div class="role">Quản lý sản phẩm tại công ty fintech/ecom</div>
+        <div class="tag tag-amber" style="margin-bottom:12px;">Sản phẩm</div>
+        <div class="persona-detail">
+          <strong>Nhu cầu:</strong>
+          <ul style="margin:8px 0 0 16px; font-size:13px;">
+            <li>Cải thiện trải nghiệm tìm kiếm cho user</li>
+            <li>Ra mắt tính năng AI nhanh</li>
+            <li>Kiểm soát chi phí hạ tầng</li>
+            <li>Đảm bảo SLA / uptime</li>
+          </ul>
+          <div style="margin-top:10px;"><strong>Lợi ích từ Vector Search:</strong></div>
+          <ul style="margin:6px 0 0 16px; font-size:13px;">
+            <li>✅ Time-to-market nhanh hơn 10x</li>
+            <li>✅ Pay-as-you-go, không overcommit</li>
+            <li>✅ SLA cam kết từ Flava</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="persona" onclick="togglePersona(this)">
+        <div class="persona-avatar">🧑‍🔬</div>
+        <h3>ML Engineer / Data Scientist</h3>
+        <div class="role">Xây dựng mô hình AI cho doanh nghiệp</div>
+        <div class="tag tag-cyan" style="margin-bottom:12px;">AI/ML</div>
+        <div class="persona-detail">
+          <strong>Nhu cầu:</strong>
+          <ul style="margin:8px 0 0 16px; font-size:13px;">
+            <li>Deploy & quản lý embedding model</li>
+            <li>Test pipeline ingest/search nhanh</li>
+            <li>Tích hợp với workflow MLOps</li>
+            <li>Monitor chất lượng search</li>
+          </ul>
+          <div style="margin-top:10px;"><strong>Lợi ích từ Vector Search:</strong></div>
+          <ul style="margin:6px 0 0 16px; font-size:13px;">
+            <li>✅ ML Model Catalog built-in</li>
+            <li>✅ Simulate pipeline không cần code</li>
+            <li>✅ Tự deploy model vào cluster</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="persona" onclick="togglePersona(this)">
+        <div class="persona-avatar">🏢</div>
+        <h3>CTO / Engineering Manager</h3>
+        <div class="role">Lãnh đạo kỹ thuật doanh nghiệp</div>
+        <div class="tag tag-green" style="margin-bottom:12px;">Leadership</div>
+        <div class="persona-detail">
+          <strong>Nhu cầu:</strong>
+          <ul style="margin:8px 0 0 16px; font-size:13px;">
+            <li>Giảm gánh nặng vận hành hạ tầng</li>
+            <li>Bảo mật dữ liệu trong nước (data residency)</li>
+            <li>Compliance và audit log</li>
+            <li>Quản lý access control tập trung</li>
+          </ul>
+          <div style="margin-top:10px;"><strong>Lợi ích từ Vector Search:</strong></div>
+          <ul style="margin:6px 0 0 16px; font-size:13px;">
+            <li>✅ Dữ liệu ở hạ tầng Flava trong nước</li>
+            <li>✅ IAM & DB Role control</li>
+            <li>✅ Không cần tuyển SRE riêng</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. VẤN ĐỀ & GIẢI PHÁP ── -->
+  <section id="problem" class="section">
+    <div class="section-title">Vấn đề & Giải pháp</div>
+    <p class="section-subtitle">Vector Search giải quyết những bài toán thực tế nào?</p>
+
+    <div style="display:flex; flex-direction:column; gap:24px;">
+
+      <div class="ps-grid">
+        <div class="ps-card problem">
+          <h3>❌ Vấn đề: Tự vận hành OpenSearch</h3>
+          <ul>
+            <li>😰 <span>Tốn 2-4 tuần setup cluster production</span></li>
+            <li>😰 <span>Cần DevOps chuyên biệt để maintain</span></li>
+            <li>😰 <span>Upgrade version = downtime risk</span></li>
+            <li>😰 <span>Backup & recovery phức tạp</span></li>
+            <li>😰 <span>Scale khó, dễ bottleneck khi traffic tăng</span></li>
+          </ul>
+        </div>
+        <div class="ps-card solution">
+          <h3>✅ Giải pháp: Flava Vector Search</h3>
+          <ul>
+            <li>✅ <span>Cluster sẵn sàng trong ~3 phút</span></li>
+            <li>✅ <span>Fully managed — Flava lo vận hành</span></li>
+            <li>✅ <span>Zero-downtime upgrade</span></li>
+            <li>✅ <span>Auto backup, point-in-time recovery</span></li>
+            <li>✅ <span>Scale node groups theo nhu cầu</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ps-grid">
+        <div class="ps-card problem">
+          <h3>❌ Vấn đề: Tích hợp AI Search phức tạp</h3>
+          <ul>
+            <li>😰 <span>Phải tự deploy & quản lý embedding model</span></li>
+            <li>😰 <span>Pipeline ingest dữ liệu cực kỳ phức tạp</span></li>
+            <li>😰 <span>Debug pipeline khó, không có tool trực quan</span></li>
+            <li>😰 <span>Hybrid search (keyword + vector) khó cấu hình</span></li>
+          </ul>
+        </div>
+        <div class="ps-card solution">
+          <h3>✅ Giải pháp: ML Model Catalog + Visual Pipeline</h3>
+          <ul>
+            <li>✅ <span>ML Model Catalog — đăng ký model 1 click</span></li>
+            <li>✅ <span>Visual pipeline editor — kéo thả processor</span></li>
+            <li>✅ <span>Simulate pipeline trực tiếp trên UI</span></li>
+            <li>✅ <span>Hybrid search built-in hỗ trợ sẵn</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ps-grid">
+        <div class="ps-card problem">
+          <h3>❌ Vấn đề: Bảo mật và kiểm soát truy cập</h3>
+          <ul>
+            <li>😰 <span>Khó phân quyền theo từng index</span></li>
+            <li>😰 <span>Không kiểm soát được field-level security</span></li>
+            <li>😰 <span>Audit log rải rác, khó truy vết</span></li>
+          </ul>
+        </div>
+        <div class="ps-card solution">
+          <h3>✅ Giải pháp: DB Role & IAM</h3>
+          <ul>
+            <li>✅ <span>DB Role: phân quyền theo index pattern</span></li>
+            <li>✅ <span>Field-level & Document-level security</span></li>
+            <li>✅ <span>Tích hợp IAM tập trung của Flava</span></li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 4. HÀNH TRÌNH ── -->
+  <section id="journey" class="section">
+    <div class="section-title">Hành trình sử dụng</div>
+    <p class="section-subtitle">Từ khi tạo service đến khi có tìm kiếm AI hoạt động — nhấn từng bước để xem chi tiết.</p>
+
+    <div class="journey" id="journeySteps">
+      <div class="journey-step active" onclick="selectStep(0)">
+        <div class="step-num">1</div>
+        <h4>Tạo Service</h4>
+        <p>Khởi tạo cluster</p>
+      </div>
+      <div class="journey-step" onclick="selectStep(1)" style="margin-left:24px;">
+        <div class="step-num">2</div>
+        <h4>Tạo Index</h4>
+        <p>Định nghĩa schema</p>
+      </div>
+      <div class="journey-step" onclick="selectStep(2)" style="margin-left:24px;">
+        <div class="step-num">3</div>
+        <h4>Đăng ký ML Model</h4>
+        <p>Gắn embedding model</p>
+      </div>
+      <div class="journey-step" onclick="selectStep(3)" style="margin-left:24px;">
+        <div class="step-num">4</div>
+        <h4>Tạo Pipeline</h4>
+        <p>Cấu hình luồng xử lý</p>
+      </div>
+      <div class="journey-step" onclick="selectStep(4)" style="margin-left:24px;">
+        <div class="step-num">5</div>
+        <h4>Ingest Dữ liệu</h4>
+        <p>Đẩy dữ liệu vào index</p>
+      </div>
+      <div class="journey-step" onclick="selectStep(5)" style="margin-left:24px;">
+        <div class="step-num">6</div>
+        <h4>Search!</h4>
+        <p>Gọi API tìm kiếm</p>
+      </div>
+    </div>
+
+    <div class="journey-detail" id="journeyDetail"></div>
+  </section>
+
+  <!-- ── 5. TÍNH NĂNG ── -->
+  <section id="features" class="section">
+    <div class="section-title">Tính năng chính</div>
+    <p class="section-subtitle">Nhấn để xem chi tiết từng tính năng.</p>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <div class="feature-header" onclick="toggleFeature(this)">
+          <span>🏗️ Quản lý Service (Cluster)</span>
+          <span class="feature-arrow">▼</span>
+        </div>
+        <div class="feature-body">
+          <div class="feature-body-inner">
+            <p style="margin-bottom:10px;">Toàn bộ vòng đời của một cluster OpenSearch được quản lý qua giao diện hoặc API:</p>
+            <ul>
+              <li><strong>Tạo service:</strong> Chọn engine version, node flavor (CPU/RAM), số lượng node, Availability Zone để đảm bảo high availability</li>
+              <li><strong>Gia hạn thời hạn:</strong> Cluster có thời hạn sử dụng — có thể gia hạn bất cứ lúc nào</li>
+              <li><strong>Xóa service:</strong> Dọn dẹp hoàn toàn khi không còn cần</li>
+              <li><strong>Monitor trạng thái:</strong> Polling real-time status (Running, Creating, Deleting...)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header" onclick="toggleFeature(this)">
+          <span>📑 Quản lý Index & Index Template</span>
+          <span class="feature-arrow">▼</span>
+        </div>
+        <div class="feature-body">
+          <div class="feature-body-inner">
+            <p style="margin-bottom:10px;"><strong>Index</strong> là nơi lưu trữ dữ liệu — tương tự như "bảng" trong database quan hệ.</p>
+            <ul>
+              <li><strong>Index Template:</strong> Blueprint cho index — định nghĩa schema, mapping fields (đặc biệt là knn_vector field)</li>
+              <li><strong>Visual mode:</strong> Cấu hình field knn_vector bằng giao diện (chọn engine, space type, dimension...)</li>
+              <li><strong>Code mode:</strong> Viết raw JSON mapping cho người dùng advanced</li>
+              <li><strong>Index Patterns:</strong> Một template có thể áp dụng cho nhiều index theo pattern wildcard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header" onclick="toggleFeature(this)">
+          <span>🤖 ML Model Catalog</span>
+          <span class="feature-arrow">▼</span>
+        </div>
+        <div class="feature-body">
+          <div class="feature-body-inner">
+            <p style="margin-bottom:10px;">Trung tâm quản lý embedding model cho vector search:</p>
+            <ul>
+              <li><strong>Model Catalog:</strong> Danh sách model đã được kiểm duyệt, sẵn sàng sử dụng</li>
+              <li><strong>Đăng ký (Register):</strong> Gắn model vào một service cụ thể</li>
+              <li><strong>Deploy/Undeploy:</strong> Bật/tắt model trên cluster — tiết kiệm tài nguyên</li>
+              <li><strong>Liên kết pipeline:</strong> Xem model đang được dùng bởi pipeline nào</li>
+            </ul>
+            <div style="margin-top:10px; padding:10px; background:#fef3c7; border-radius:8px; font-size:13px;">
+              💡 <strong>Ví dụ:</strong> Model "multilingual-e5-small" chuyển văn bản tiếng Việt thành vector 384 chiều, hỗ trợ tìm kiếm đa ngôn ngữ
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header" onclick="toggleFeature(this)">
+          <span>⚙️ Pipeline (Ingest & Search)</span>
+          <span class="feature-arrow">▼</span>
+        </div>
+        <div class="feature-body">
+          <div class="feature-body-inner">
+            <p style="margin-bottom:10px;">Pipeline là "dây chuyền xử lý" dữ liệu — định nghĩa cách dữ liệu được biến đổi khi lưu vào và khi tìm kiếm:</p>
+            <ul>
+              <li><strong>Ingest Pipeline:</strong> Xử lý document khi đưa vào index — ví dụ: gọi ML model để tạo vector từ text</li>
+              <li><strong>Search Pipeline:</strong> Xử lý query khi tìm kiếm — ví dụ: chuyển query text thành vector, hybrid scoring</li>
+              <li><strong>Visual Editor:</strong> Kéo thả processor, xem flow trực quan — không cần JSON</li>
+              <li><strong>Simulate:</strong> Test pipeline với dữ liệu mẫu ngay trên UI, không cần deploy thật</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-item">
+        <div class="feature-header" onclick="toggleFeature(this)">
+          <span>🔐 Bảo mật: DB Role & User</span>
+          <span class="feature-arrow">▼</span>
+        </div>
+        <div class="feature-body">
+          <div class="feature-body-inner">
+            <ul>
+              <li><strong>DB Role:</strong> Định nghĩa quyền truy cập theo index pattern — read, write, create index...</li>
+              <li><strong>Field-level Security:</strong> Ẩn/cho phép chỉ đọc các field cụ thể</li>
+              <li><strong>Document-level Security:</strong> Chỉ xem document thỏa điều kiện nhất định (ví dụ: chỉ xem data của tenant mình)</li>
+              <li><strong>System Account:</strong> Tài khoản dịch vụ để ứng dụng kết nối</li>
+              <li><strong>IAM User:</strong> Gắn người dùng Flava IAM với DB Role</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 6. GIÁ TRỊ ── -->
+  <section id="value" class="section">
+    <div class="section-title">Giá trị kinh doanh</div>
+    <p class="section-subtitle">Tại sao dùng Vector Search thay vì tự build?</p>
+
+    <div class="grid-4" style="margin-bottom:32px;">
+      <div class="metric-card blue">
+        <div class="big">10x</div>
+        <div class="label">Nhanh hơn khi triển khai so với tự dựng</div>
+      </div>
+      <div class="metric-card cyan">
+        <div class="big">0</div>
+        <div class="label">Kỹ sư vận hành cần thêm</div>
+      </div>
+      <div class="metric-card green">
+        <div class="big">99.9%</div>
+        <div class="label">Uptime SLA cam kết</div>
+      </div>
+      <div class="metric-card amber">
+        <div class="big">3 phút</div>
+        <div class="label">Từ đăng ký đến cluster sẵn sàng</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="margin-bottom:12px;">💰 Lợi ích về chi phí</h3>
+        <ul style="font-size:14px; color:var(--text-secondary); padding-left:18px;">
+          <li style="margin-bottom:8px;">Không cần mua license OpenSearch thương mại</li>
+          <li style="margin-bottom:8px;">Không cần thuê SRE/DevOps chuyên biệt</li>
+          <li style="margin-bottom:8px;">Pay-as-you-go: chỉ trả tiền cho tài nguyên thực dùng</li>
+          <li style="margin-bottom:8px;">Tự động scale giảm chi phí lúc ít traffic</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;">⚡ Lợi ích về tốc độ ra thị trường</h3>
+        <ul style="font-size:14px; color:var(--text-secondary); padding-left:18px;">
+          <li style="margin-bottom:8px;">Dev team tập trung vào feature, không lo infra</li>
+          <li style="margin-bottom:8px;">Pipeline editor trực quan = không cần OpenSearch expert</li>
+          <li style="margin-bottom:8px;">ML Model Catalog sẵn = không cần train model từ đầu</li>
+          <li style="margin-bottom:8px;">Simulate trước khi deploy = ít bug production hơn</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;">🌟 Trải nghiệm người dùng cuối</h3>
+        <ul style="font-size:14px; color:var(--text-secondary); padding-left:18px;">
+          <li style="margin-bottom:8px;">Tìm kiếm hiểu ngữ nghĩa → kết quả liên quan hơn</li>
+          <li style="margin-bottom:8px;">Hỗ trợ tìm kiếm bằng tiếng Việt tự nhiên</li>
+          <li style="margin-bottom:8px;">Hybrid search: kết hợp keyword + semantic</li>
+          <li style="margin-bottom:8px;">Gợi ý sản phẩm/nội dung cá nhân hóa</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;">🛡️ Bảo mật & Tuân thủ</h3>
+        <ul style="font-size:14px; color:var(--text-secondary); padding-left:18px;">
+          <li style="margin-bottom:8px;">Dữ liệu ở hạ tầng Flava trong nước</li>
+          <li style="margin-bottom:8px;">Kiểm soát truy cập chi tiết đến từng field</li>
+          <li style="margin-bottom:8px;">Audit log đầy đủ</li>
+          <li style="margin-bottom:8px;">Multi-tenant isolation qua Document-level Security</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7. SO SÁNH ── -->
+  <section id="compare" class="section">
+    <div class="section-title">So sánh lựa chọn</div>
+    <p class="section-subtitle">Flava Vector Search vs các lựa chọn khác.</p>
+
+    <div style="overflow-x:auto; margin-bottom:32px;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Tiêu chí</th>
+            <th>🏆 Flava VS</th>
+            <th>Tự dựng OpenSearch</th>
+            <th>Pinecone / Weaviate</th>
+            <th>ElasticSearch Cloud</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Thời gian setup</td>
+            <td><span style="color:#10b981; font-weight:700;">~3 phút</span></td>
+            <td>2-4 tuần</td>
+            <td>~30 phút</td>
+            <td>~1 giờ</td>
+          </tr>
+          <tr>
+            <td>Chi phí vận hành</td>
+            <td><span class="check">✓</span> Thấp</td>
+            <td><span class="cross">✗</span> Cao (cần SRE)</td>
+            <td><span class="check">✓</span> Thấp</td>
+            <td>Trung bình</td>
+          </tr>
+          <tr>
+            <td>Dữ liệu trong nước</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="cross">✗</span> Offshore</td>
+            <td><span class="cross">✗</span> Offshore</td>
+          </tr>
+          <tr>
+            <td>Hybrid Search</td>
+            <td><span class="check">✓</span></td>
+            <td>Cần tự config</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Visual Pipeline Editor</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+            <td>Hạn chế</td>
+          </tr>
+          <tr>
+            <td>ML Model built-in</td>
+            <td><span class="check">✓</span> Catalog</td>
+            <td>Tự deploy</td>
+            <td><span class="check">✓</span></td>
+            <td>Elberd</td>
+          </tr>
+          <tr>
+            <td>Tích hợp IAM Flava</td>
+            <td><span class="check">✓</span></td>
+            <td>Tự làm</td>
+            <td><span class="cross">✗</span></td>
+            <td><span class="cross">✗</span></td>
+          </tr>
+          <tr>
+            <td>Full-text + Vector</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td>Hạn chế</td>
+            <td><span class="check">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="padding:20px; background:linear-gradient(135deg,#eef2ff,#ecfeff); border-radius:12px; font-size:14px;">
+      <strong>💡 Khi nào nên dùng Flava Vector Search?</strong>
+      <ul style="margin-top:10px; padding-left:18px; color:var(--text-secondary);">
+        <li style="margin-bottom:6px;">Bạn đang xây dựng tính năng AI search / chatbot RAG trên Flava Cloud</li>
+        <li style="margin-bottom:6px;">Cần dữ liệu lưu trong nước (data residency) — luật pháp yêu cầu</li>
+        <li style="margin-bottom:6px;">Team nhỏ, không muốn tốn engineering time cho infra</li>
+        <li style="margin-bottom:6px;">Cần tích hợp sâu với các sản phẩm khác của Flava (IAM, VPC, Monitoring)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 8. THỰC TẾ ── -->
+  <section id="realworld" class="section">
+    <div class="section-title">🌍 Ví dụ thực tế từ A đến Z</div>
+    <p class="section-subtitle">Theo dõi hành trình đầy đủ của đội dev <strong>ShopVN</strong> — từ cluster trống đến AI search sẵn sàng production.</p>
+
+    <!-- Scenario card -->
+    <div class="rw-scenario">
+      <div class="rw-scenario-logo">🛍️</div>
+      <div class="rw-scenario-info">
+        <h3>ShopVN — Sàn thương mại điện tử Việt Nam</h3>
+        <p>500,000 sản phẩm thời trang · Keyword search đang tệ · Quyết định nâng cấp AI Search</p>
+        <div class="rw-scenario-tags">
+          <span class="rw-scenario-tag">E-commerce</span>
+          <span class="rw-scenario-tag">500K sản phẩm</span>
+          <span class="rw-scenario-tag">Tiếng Việt + Tiếng Anh</span>
+          <span class="rw-scenario-tag">Hybrid Search</span>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,.12); border-radius:12px; padding:14px 20px; text-align:center; flex-shrink:0;">
+        <div style="font-size:28px; font-weight:800;">~15 phút</div>
+        <div style="font-size:11px; opacity:.7; margin-top:2px;">Từ zero → AI Search live</div>
+      </div>
+    </div>
+
+    <!-- Problem statement -->
+    <div style="margin-bottom:24px; padding:16px 20px; background:#fff1f2; border:1px solid #fecdd3; border-radius:12px;">
+      <div style="font-weight:700; color:#991b1b; margin-bottom:8px;">❌ Vấn đề hiện tại của ShopVN</div>
+      <div style="font-size:13px; color:#7f1d1d; display:flex; flex-wrap:wrap; gap:12px 24px;">
+        <span>• User gõ <em>"áo mùa hè mát mẻ"</em> → 0 kết quả</span>
+        <span>• Gõ <em>"cotton shirt"</em> → không ra sản phẩm tên tiếng Việt</span>
+        <span>• Gợi ý sản phẩm tương tự không chính xác</span>
+        <span>• Tỉ lệ tìm kiếm thành công chỉ <strong>41%</strong></span>
+      </div>
+    </div>
+
+    <!-- Timeline phases -->
+    <div class="rw-timeline">
+
+      <!-- Phase 1 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">1</div>
+          <div class="rw-phase-title">🏗️ Tạo Vector Search Service</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ ~3 phút</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">✓ Done</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Kỹ sư Minh chọn <strong>Easy create</strong> — Flava tự chọn cấu hình tối ưu, không cần tính toán gì thêm.</p>
+            <div class="rw-config-grid">
+              <div class="rw-config-item"><div class="cfg-lbl">Engine</div><div class="cfg-val">OpenSearch 2.11</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Node flavor</div><div class="cfg-val">4 vCPU / 8 GB RAM</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Data nodes</div><div class="cfg-val">2 nodes</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Availability Zone</div><div class="cfg-val">vn-1a + vn-1b</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Network</div><div class="cfg-val">VPC shopvn-prod</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Lifetime</div><div class="cfg-val">3 tháng</div></div>
+            </div>
+            <div class="rw-phase-callout">
+              💡 Kết quả: Cluster <code>shopvn-vs-prod</code> — trạng thái <strong>Running</strong> sau 3 phút. Endpoint: <code>shopvn-vs-prod.internal.flava.vn:9200</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">2</div>
+          <div class="rw-phase-title">📑 Tạo Index Template cho sản phẩm</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ ~5 phút</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">✓ Done</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Minh dùng <strong>Visual Editor</strong> để thiết kế schema. Điểm mấu chốt: khai báo field <code>name_vector</code> với dimension = 384 (khớp model sẽ chọn ở Bước 3).</p>
+            <div class="code-block"><span class="cm">// Index Pattern: products-*  (áp dụng cho mọi index tên "products-...")</span>
+{
+  <span class="ck">"mappings"</span>: {
+    <span class="ck">"properties"</span>: {
+      <span class="ck">"product_id"</span>:  { <span class="ck">"type"</span>: <span class="cv">"keyword"</span> },
+      <span class="ck">"name"</span>:         { <span class="ck">"type"</span>: <span class="cv">"text"</span> },
+      <span class="ck">"category"</span>:     { <span class="ck">"type"</span>: <span class="cv">"keyword"</span> },
+      <span class="ck">"price"</span>:        { <span class="ck">"type"</span>: <span class="cv">"float"</span> },
+      <span class="ck">"name_vector"</span>:  {              <span class="cm">// ← Trường vector</span>
+        <span class="ck">"type"</span>:         <span class="cv">"knn_vector"</span>,
+        <span class="ck">"dimension"</span>:    <span class="cn">384</span>,         <span class="cm">// ← Khớp output của multilingual-e5-small</span>
+        <span class="ck">"method"</span>: {
+          <span class="ck">"engine"</span>:       <span class="cv">"faiss"</span>,
+          <span class="ck">"space_type"</span>:  <span class="cv">"cosine"</span>,
+          <span class="ck">"name"</span>:        <span class="cv">"hnsw"</span>
+        }
+      }
+    }
+  }
+}</div>
+            <div class="rw-phase-callout">
+              💡 Kết quả: Template <code>shopvn-product-tmpl</code> + Index <code>products-2024</code> tạo xong. Sẵn sàng nhận dữ liệu.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">3</div>
+          <div class="rw-phase-title">🤖 Đăng ký ML Model: multilingual-e5-small</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ ~2 phút</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">✓ Done</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">ShopVN có catalog tiếng Việt lẫn tiếng Anh — chọn <strong>multilingual-e5-small</strong> vì hiểu cả hai ngôn ngữ (50+ languages).</p>
+            <div class="rw-config-grid">
+              <div class="rw-config-item"><div class="cfg-lbl">Model</div><div class="cfg-val">multilingual-e5-small</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Dimension output</div><div class="cfg-val">384</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Ngôn ngữ</div><div class="cfg-val">50+ (incl. VI)</div></div>
+              <div class="rw-config-item"><div class="cfg-lbl">Trạng thái</div><div class="cfg-val" style="color:#10b981;">✅ Deployed</div></div>
+            </div>
+            <div style="margin-top:10px;padding:10px 12px;background:#fef3c7;border-radius:8px;font-size:13px;">
+              📌 <strong>Model ID sau khi deploy:</strong> <code>aBcD1234eFgH5678</code> — ghi nhận ID này, sẽ dùng ở Bước 4.
+            </div>
+            <div class="rw-phase-callout">
+              💡 Lý do chọn multilingual: User gõ <em>"cotton shirt"</em> (EN) cũng phải ra sản phẩm <em>"áo thun cotton"</em> (VI). Chỉ multilingual model mới hiểu cross-lingual như vậy.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">4</div>
+          <div class="rw-phase-title">⚙️ Tạo Ingest Pipeline + Search Pipeline</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ ~5 phút</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">✓ Done</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">① Ingest Pipeline — <code>shopvn-ingest-v1</code>:</div>
+            <div class="code-block"><span class="cm">// Processor: Text Embedding — gọi model, chuyển field "name" → "name_vector"</span>
+{
+  <span class="ck">"text_embedding"</span>: {
+    <span class="ck">"model_id"</span>:  <span class="cv">"aBcD1234eFgH5678"</span>,    <span class="cm">// ← Model ID từ Bước 3</span>
+    <span class="ck">"field_map"</span>: { <span class="ck">"name"</span>: <span class="cv">"name_vector"</span> }
+  }
+}</div>
+
+            <div style="font-size:13px;font-weight:700;margin-top:16px;margin-bottom:6px;">② Search Pipeline — <code>shopvn-search-hybrid-v1</code>:</div>
+            <div class="code-block"><span class="cm">// Processor 1: Neural Query Enricher — tự vector hóa query text</span>
+{ <span class="ck">"neural_query_enricher"</span>: { <span class="ck">"default_model_id"</span>: <span class="cv">"aBcD1234eFgH5678"</span> } }
+
+<span class="cm">// Processor 2: Normalization — trọng số hybrid = 30% BM25 + 70% Neural</span>
+{
+  <span class="ck">"normalization-processor"</span>: {
+    <span class="ck">"weights"</span>:     [<span class="cn">0.3</span>, <span class="cn">0.7</span>],
+    <span class="ck">"combination"</span>: { <span class="ck">"technique"</span>: <span class="cv">"arithmetic_mean"</span> }
+  }
+}</div>
+
+            <div style="margin-top:12px;padding:10px 12px;background:#ecfeff;border-radius:8px;font-size:13px;">
+              🧪 <strong>Simulate thành công:</strong> Input <code>{"name": "Áo thun cotton nam"}</code> → Output có thêm <code>name_vector: [0.021, -0.043, ...]</code> (384 chiều). ✅
+            </div>
+            <div class="rw-phase-callout">
+              💡 Tại sao 70% neural? ShopVN nhận thấy user thường gõ mô tả sản phẩm hơn là tên chính xác. Trọng số này có thể điều chỉnh sau bằng cách edit pipeline, không cần re-index.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">5</div>
+          <div class="rw-phase-title">📦 Ingest 500,000 sản phẩm</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ ~4 giờ (500K docs)</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">✓ Done</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">Backend ShopVN đọc từ MySQL và gọi Bulk API theo batch 500 document / request.</p>
+            <div class="code-block"><span class="cc">POST</span> <span class="cv">/products-2024/_bulk?pipeline=shopvn-ingest-v1</span>
+
+<span class="cm">// Batch gồm nhiều document, mỗi cặp: action + document</span>
+{ <span class="ck">"index"</span>: { <span class="ck">"_id"</span>: <span class="cv">"sp001"</span> } }
+{ <span class="ck">"product_id"</span>: <span class="cv">"sp001"</span>, <span class="ck">"name"</span>: <span class="cv">"Áo thun cotton nam thoáng mát"</span>, <span class="ck">"category"</span>: <span class="cv">"ao-nam"</span>, <span class="ck">"price"</span>: <span class="cn">159000</span> }
+{ <span class="ck">"index"</span>: { <span class="ck">"_id"</span>: <span class="cv">"sp002"</span> } }
+{ <span class="ck">"product_id"</span>: <span class="cv">"sp002"</span>, <span class="ck">"name"</span>: <span class="cv">"Cotton Tank Top Lightweight"</span>, <span class="ck">"category"</span>: <span class="cv">"ao-nam"</span>, <span class="ck">"price"</span>: <span class="cn">189000</span> }
+{ <span class="ck">"index"</span>: { <span class="ck">"_id"</span>: <span class="cv">"sp003"</span> } }
+{ <span class="ck">"product_id"</span>: <span class="cv">"sp003"</span>, <span class="ck">"name"</span>: <span class="cv">"Áo sơ mi lụa dài tay"</span>, <span class="ck">"category"</span>: <span class="cv">"ao-nam"</span>, <span class="ck">"price"</span>: <span class="cn">289000</span> }
+
+<span class="cm">// Pipeline tự thêm name_vector vào từng document — kết quả lưu trong OpenSearch:</span>
+{ ..., <span class="ck">"name_vector"</span>: [<span class="cn">0.021</span>, <span class="cn">-0.043</span>, <span class="cn">0.218</span>, <span class="cm">... 384 số ...</span>] }</div>
+            <div class="rw-phase-callout">
+              💡 500K sản phẩm ÷ 500 docs/batch = 1,000 request. Pipeline gọi model mỗi batch → tổng ~4 giờ. Sau đó, sản phẩm mới được ingest real-time (<1 giây/document).
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 6 -->
+      <div class="rw-phase">
+        <div class="rw-phase-header" onclick="toggleRwPhase(this)">
+          <div class="rw-phase-num">6</div>
+          <div class="rw-phase-title">🔍 Search! — Thực nghiệm kết quả</div>
+          <div class="rw-phase-meta">
+            <span class="rw-phase-time">⏱️ Real-time</span>
+            <span class="rw-phase-time" style="background:#d1fae5;color:#065f46;border-color:#bbf7d0;">🎉 Live!</span>
+          </div>
+          <span class="rw-phase-arrow">▼</span>
+        </div>
+        <div class="rw-phase-body">
+          <div class="rw-phase-inner">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Hybrid Search API:</div>
+            <div class="code-block"><span class="cc">GET</span> <span class="cv">/products-2024/_search?search_pipeline=shopvn-search-hybrid-v1</span>
+{
+  <span class="ck">"query"</span>: {
+    <span class="ck">"hybrid"</span>: {
+      <span class="ck">"queries"</span>: [
+        { <span class="ck">"match"</span>: { <span class="ck">"name"</span>: <span class="cv">"áo mùa hè mát mẻ"</span> } },          <span class="cm">// BM25 (30%)</span>
+        { <span class="ck">"neural"</span>: { <span class="ck">"name_vector"</span>: {
+            <span class="ck">"query_text"</span>: <span class="cv">"áo mùa hè mát mẻ"</span>,               <span class="cm">// Neural (70%)</span>
+            <span class="ck">"model_id"</span>:   <span class="cv">"aBcD1234eFgH5678"</span>, <span class="ck">"k"</span>: <span class="cn">10</span>
+        }}}
+      ]
+    }
+  }
+}</div>
+
+            <div style="font-size:14px;font-weight:700;margin:16px 0 10px;">Kết quả thực tế — Query: <em>"áo mùa hè mát mẻ"</em></div>
+            <div class="rw-result-grid">
+              <div class="rw-result-before">
+                <h4>❌ Keyword Search cũ</h4>
+                <div class="rw-sr">
+                  <span style="color:#991b1b;font-size:13px;">0 kết quả tìm thấy</span>
+                  <div style="font-size:12px;color:#7f1d1d;margin-top:6px;">Không sản phẩm nào có tên chứa đúng từ "mùa hè mát mẻ"</div>
+                </div>
+              </div>
+              <div class="rw-result-after">
+                <h4>✅ Hybrid Search mới</h4>
+                <div class="rw-sr">
+                  <span class="rw-sr-score">Score: 0.94</span>
+                  <span class="rw-sr-name">Áo thun cotton nam thoáng mát</span>
+                  <div class="rw-sr-match">✓ Semantic: "thoáng mát" ≈ "mát mẻ mùa hè"</div>
+                </div>
+                <div class="rw-sr">
+                  <span class="rw-sr-score">Score: 0.89</span>
+                  <span class="rw-sr-name">Cotton Tank Top Lightweight</span>
+                  <div class="rw-sr-match">✓ Cross-lingual: tiếng Anh match ngữ nghĩa tiếng Việt</div>
+                </div>
+                <div class="rw-sr">
+                  <span class="rw-sr-score">Score: 0.81</span>
+                  <span class="rw-sr-name">Áo thun tay ngắn dáng rộng</span>
+                  <div class="rw-sr-match">✓ Semantic: "tay ngắn" liên quan đến "mùa hè mát mẻ"</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end rw-timeline -->
+
+    <!-- Summary results -->
+    <div class="rw-summary">
+      <h3>🏆 Kết quả sau 1 tháng triển khai</h3>
+      <div class="grid-4" style="margin-bottom:20px;">
+        <div class="metric-card blue" style="padding:16px;">
+          <div class="big" style="font-size:26px;">41% → 78%</div>
+          <div class="label">Tỉ lệ tìm kiếm thành công</div>
+        </div>
+        <div class="metric-card cyan" style="padding:16px;">
+          <div class="big" style="font-size:26px;">+34%</div>
+          <div class="label">Chuyển đổi từ tìm kiếm</div>
+        </div>
+        <div class="metric-card green" style="padding:16px;">
+          <div class="big" style="font-size:26px;">~15 phút</div>
+          <div class="label">Setup toàn bộ hệ thống</div>
+        </div>
+        <div class="metric-card amber" style="padding:16px;">
+          <div class="big" style="font-size:26px;">0 SRE</div>
+          <div class="label">Kỹ sư vận hành cần thêm</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);padding:14px 18px;background:white;border-radius:10px;border-left:4px solid var(--primary);">
+        <strong>💬 Phản hồi của team:</strong> "Trước đây chúng tôi tốn 3 tháng nghiên cứu cách tự dựng OpenSearch + deploy ML model. Với Flava Vector Search, cả team setup xong trong 1 buổi sáng và không lo maintain nữa." — <em>Minh, Senior Engineer @ ShopVN</em>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 9. QUIZ ── -->
+  <section id="quiz" class="section">
+    <div class="section-title">🧠 Kiểm tra kiến thức</div>
+    <p class="section-subtitle">Thử sức với 5 câu hỏi về Vector Search!</p>
+
+    <div class="quiz-card">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div id="quizContent"></div>
+      <div class="quiz-score" id="quizScore">
+        <div class="score-num" id="scoreNum"></div>
+        <p id="scoreFeedback"></p>
+        <button class="quiz-restart" onclick="restartQuiz()">🔄 Làm lại</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════ SCRIPT ═══════════════════ -->
+<script>
+  // ── Tab navigation ──
+  function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'quiz') initQuiz();
+  }
+
+  // ── Persona toggle ──
+  function togglePersona(el) {
+    const isSelected = el.classList.contains('selected');
+    document.querySelectorAll('.persona').forEach(p => p.classList.remove('selected'));
+    if (!isSelected) el.classList.add('selected');
+  }
+
+  // ── Feature accordion ──
+  function toggleFeature(header) {
+    const body = header.nextElementSibling;
+    const allHeaders = document.querySelectorAll('.feature-header');
+    const allBodies  = document.querySelectorAll('.feature-body');
+
+    const isOpen = body.classList.contains('open');
+    allHeaders.forEach(h => h.classList.remove('open'));
+    allBodies.forEach(b  => b.classList.remove('open'));
+
+    if (!isOpen) {
+      header.classList.add('open');
+      body.classList.add('open');
+    }
+  }
+
+  // ── Journey steps ──
+  const journeyDetails = [
+    {
+      emoji: '🏗️',
+      title: 'Bước 1: Tạo Service',
+      subtitle: 'Khởi tạo cluster OpenSearch được quản lý hoàn toàn bởi Flava',
+      what: 'Một <strong>cluster OpenSearch</strong> chạy trên hạ tầng Flava, gồm nhiều node được phân vai trò rõ ràng (Master, Data, Coordinator). Đây là nền tảng lưu trữ và tìm kiếm toàn bộ dữ liệu vector của bạn.',
+      when: '<ul><li>Khi bắt đầu một dự án AI search hoàn toàn mới</li><li>Khi cần tách biệt môi trường dev / staging / production</li><li>Khi team muốn có cluster riêng, không chia sẻ với product khác</li></ul>',
+      why: '<ul><li>Không mất 2–4 tuần tự dựng và cấu hình OpenSearch từ đầu</li><li>Flava quản lý backup, upgrade, scaling — dev team không cần lo infra</li><li>Cluster nằm trong VPC riêng, bảo mật theo chuẩn enterprise</li><li>SLA uptime 99.9% được cam kết bởi Flava</li></ul>',
+      how: '<ul><li>Chọn <strong>phiên bản OpenSearch</strong> (engine version)</li><li>Cấu hình <strong>Node Group</strong>: loại máy (flavor), số lượng node, Availability Zone</li><li>Chọn <strong>VPC / Network</strong> để cluster nằm trong mạng nội bộ</li><li>Đặt <strong>thời hạn sử dụng</strong> (lifetime) — có thể gia hạn sau</li><li>2 chế độ: <strong>Easy create</strong> (Flava tự chọn tối ưu) hoặc <strong>Customize</strong> (tùy chỉnh từng node role)</li></ul>',
+      tip: '⏱️ Thời gian hoàn thành: khoảng 3 phút. Kết quả: cluster đang chạy với endpoint sẵn sàng để kết nối.',
+    },
+    {
+      emoji: '📑',
+      title: 'Bước 2: Tạo Index Template & Index',
+      subtitle: 'Định nghĩa "bản thiết kế" cho dữ liệu — đặc biệt là khai báo trường vector',
+      what: '<strong>Index Template</strong> là blueprint xác định cấu trúc dữ liệu (field mapping), bao gồm trường vector (<code>knn_vector</code>) với thông số kỹ thuật như dimension, engine, space type. <strong>Index</strong> là instance thực tế tạo từ template đó — nơi dữ liệu được lưu trữ.',
+      when: '<ul><li>Ngay sau khi cluster sẵn sàng, trước khi đẩy bất kỳ dữ liệu nào vào</li><li>Khi cần thay đổi schema (tạo template mới → index mới từ template cập nhật)</li><li>Khi thiết kế multi-index strategy (mỗi loại dữ liệu một index riêng)</li></ul>',
+      why: '<ul><li>OpenSearch cần biết trường nào là vector để lập chỉ mục đúng cách (thuật toán HNSW)</li><li>Khai báo <code>dimension</code> sai → không thể lưu vector sau này, phải tạo lại index</li><li>Index Template → nhiều index cùng schema mà không cần khai báo lại</li><li>Index Pattern (wildcard) giúp pipeline tự động áp dụng cho index mới</li></ul>',
+      how: '<ul><li>Chọn <strong>Visual Editor</strong> (UI thân thiện) hoặc <strong>Code Editor</strong> (viết JSON mapping raw)</li><li>Khai báo trường <code>knn_vector</code>: chọn <strong>engine</strong> (Faiss / Lucene), <strong>space type</strong> (L2 / Cosine / Inner product), <strong>dimension</strong></li><li>Đặt <strong>index patterns</strong> (ví dụ: <code>product-*</code>) để template tự áp dụng</li><li>Tạo Index từ template đã tạo</li></ul>',
+      tip: '💡 Dimension của trường vector phải khớp với output của ML model ở Bước 3. Ví dụ: model multilingual-e5-small → dimension 384.',
+    },
+    {
+      emoji: '🤖',
+      title: 'Bước 3: Đăng ký & Deploy ML Model',
+      subtitle: 'Gắn embedding model vào cluster — "bộ não" chuyển text thành vector',
+      what: '<strong>Embedding Model</strong> là mô hình AI nhận văn bản đầu vào và trả về dãy số (vector) đại diện cho ý nghĩa ngữ nghĩa. Model được lưu trong <strong>ML Model Catalog</strong> của Flava và có thể deploy trực tiếp vào cluster Vector Search.',
+      when: '<ul><li>Sau khi tạo Index Template, trước khi tạo Pipeline</li><li>Khi muốn thay model mới (chất lượng tốt hơn, hỗ trợ ngôn ngữ mới)</li><li>Khi cần undeploy model cũ để giải phóng tài nguyên cluster</li></ul>',
+      why: '<ul><li>Pipeline tham chiếu đến model ID cụ thể để gọi embedding — không có model thì pipeline không chạy được</li><li>Model trong Catalog đã được kiểm duyệt, không cần tự train hay tự host</li><li>Deploy model trực tiếp trong cluster → latency thấp, không round-trip ra ngoài</li><li>Một model có thể dùng chung cho nhiều pipeline / nhiều index</li></ul>',
+      how: '<ul><li>Vào tab <strong>ML Model</strong> của service → nhấn <strong>Register</strong></li><li>Chọn model từ Catalog (ví dụ: <em>multilingual-e5-small</em>)</li><li>Sau khi Register, nhấn <strong>Deploy</strong> → trạng thái chuyển sang <em>Deployed</em></li><li>Ghi nhận <strong>Model ID</strong> — sẽ dùng ở Bước 4 khi cấu hình processor</li></ul>',
+      tip: '📌 Chỉ model ở trạng thái <strong>Deployed</strong> mới được pipeline gọi được. Model đã Register nhưng chưa Deploy sẽ khiến pipeline lỗi khi ingest/search.',
+    },
+    {
+      emoji: '⚙️',
+      title: 'Bước 4: Tạo Pipeline',
+      subtitle: 'Định nghĩa luồng xử lý dữ liệu khi lưu vào và khi tìm kiếm',
+      what: '<strong>Pipeline</strong> là chuỗi các <em>Processor</em> thực thi tuần tự trên dữ liệu. Có 2 loại:<br>• <strong>Ingest Pipeline</strong>: chạy khi document vào index — thường dùng để tạo vector từ text.<br>• <strong>Search Pipeline</strong>: chạy khi có query — thường dùng để vector hóa query, hybrid scoring.',
+      when: '<ul><li>Sau khi model đã Deploy thành công (Bước 3)</li><li>Ingest Pipeline: tạo trước lần đầu tiên đẩy dữ liệu vào index</li><li>Search Pipeline: khi muốn bật semantic / hybrid search trên index</li><li>Khi cần thay đổi logic xử lý (thêm bước normalize, rerank, filter...)</li></ul>',
+      why: '<ul><li>Không có Ingest Pipeline → document vào index không có vector → không thể semantic search</li><li>Không có Search Pipeline → query chỉ là keyword search thuần túy, không hiểu nghĩa</li><li>Pipeline tách biệt logic AI khỏi ứng dụng — app chỉ gọi OpenSearch API bình thường</li><li>Visual Editor + Simulate → test ngay mà không cần deploy thật</li></ul>',
+      how: '<ul><li>Vào tab <strong>Pipeline</strong> → tạo mới, chọn <strong>Visual Editor</strong> hoặc <strong>Code Editor</strong></li><li>Ingest: thêm processor <em>Text Embedding</em> → chọn model đã deploy, ánh xạ field text → field vector</li><li>Search: thêm processor <em>Neural Query Enricher</em> và/hoặc <em>Hybrid Score</em> với trọng số BM25 / Neural</li><li>Nhấn <strong>Simulate</strong> để test với dữ liệu mẫu trước khi lưu chính thức</li><li>Lưu pipeline → ghi nhận <strong>Pipeline ID</strong></li></ul>',
+      tip: '🧪 Luôn Simulate trước khi dùng thật. Simulate cho thấy output của từng processor — giúp phát hiện lỗi field mapping trước khi ảnh hưởng đến production.',
+    },
+    {
+      emoji: '📦',
+      title: 'Bước 5: Ingest Dữ liệu',
+      subtitle: 'Đẩy nội dung thực tế vào index — pipeline tự động tạo vector',
+      what: '<strong>Ingest</strong> là quá trình đưa document (bản ghi dữ liệu) vào OpenSearch index. Mỗi document đi qua <strong>Ingest Pipeline</strong> đã cấu hình → field text tự động được chuyển thành vector và lưu cùng document.',
+      when: '<ul><li>Sau khi Index và Ingest Pipeline đã sẵn sàng</li><li>Lần đầu tiên: import toàn bộ dữ liệu hiện có (historical data)</li><li>Liên tục: mỗi khi có dữ liệu mới cần tìm kiếm được (near real-time)</li><li>Re-index: khi đổi model hoặc thay đổi schema</li></ul>',
+      why: '<ul><li>Index rỗng → không có gì để tìm. Phải có dữ liệu thì search mới trả kết quả</li><li>Pipeline vectorization xảy ra tại bước này → mỗi document được lưu kèm vector ngay lúc ingest</li><li>Tạo vector lúc ingest (thay vì lúc search) → search sau này cực nhanh, không cần tính toán lại</li></ul>',
+      how: '<ul><li>Gọi OpenSearch <strong>Bulk API</strong> với header <code>?pipeline=&lt;pipeline-id&gt;</code></li><li>Mỗi document cần có field text tương ứng với field đã cấu hình trong pipeline processor</li><li>Flava Console hỗ trợ <strong>Bulk Index từ UI</strong> để test nhanh</li><li>Production: dùng ETL job, Kafka consumer, hoặc backend service gọi trực tiếp</li></ul>',
+      tip: '⚡ Để import lượng lớn (triệu records), dùng Bulk API với batch ~500–1000 documents/request để đạt throughput tối ưu.',
+    },
+    {
+      emoji: '🔍',
+      title: 'Bước 6: Search!',
+      subtitle: 'Ứng dụng gọi API tìm kiếm — nhận kết quả thông minh theo ngữ nghĩa',
+      what: 'Giai đoạn người dùng cuối thực sự trải nghiệm giá trị. Ứng dụng gọi <strong>OpenSearch Search API</strong>. <strong>Search Pipeline</strong> tự động vector hóa query, tính similarity với các vector đã lưu, và trả về kết quả liên quan nhất về mặt ngữ nghĩa.',
+      when: '<ul><li>Sau khi đã có dữ liệu trong index (Bước 5 hoàn tất)</li><li>Mỗi khi user gõ query tìm kiếm trong ứng dụng</li><li>Trong chatbot RAG: mỗi khi cần truy vấn knowledge base để trả lời</li><li>Trong recommendation system: khi cần tìm sản phẩm/nội dung tương tự</li></ul>',
+      why: '<ul><li>Đây là <strong>lý do chính</strong> để xây dựng toàn bộ hệ thống — mang lại trải nghiệm tìm kiếm thông minh</li><li>Kết quả liên quan theo nghĩa → user tìm thấy đúng thứ cần dù gõ sai từ khóa</li><li>Hybrid search (BM25 + neural) cho kết quả tốt nhất — keyword match + semantic match</li><li>Không cần thay đổi ứng dụng khi nâng cấp model — chỉ cập nhật pipeline là đủ</li></ul>',
+      how: '<ul><li><strong>Semantic search:</strong> dùng <code>neural</code> query + <code>search_pipeline</code> parameter</li><li><strong>Hybrid search:</strong> kết hợp <code>bool</code> query (keyword) + <code>neural</code> query với <em>normalization processor</em></li><li><strong>Keyword search:</strong> vẫn dùng BM25 bình thường — Vector Search tương thích hoàn toàn</li><li>Kết quả trả về có <code>_score</code> — score càng cao, kết quả càng liên quan</li></ul>',
+      tip: '🎯 Ví dụ thực tế: User gõ "áo mùa hè mát mẻ" → Hybrid search trả về "Cotton Tank Top" dù không trùng từ khóa nào — vì model hiểu 2 cụm từ có nghĩa tương tự nhau.',
+    },
+  ];
+
+  function selectStep(idx) {
+    const steps = document.querySelectorAll('.journey-step');
+    steps.forEach((s, i) => s.classList.toggle('active', i === idx));
+    const detail = document.getElementById('journeyDetail');
+    const d = journeyDetails[idx];
+    detail.innerHTML =
+      '<div class="jd-header">' +
+        '<h3>' + d.emoji + ' ' + d.title + '</h3>' +
+        '<p>' + d.subtitle + '</p>' +
+      '</div>' +
+      '<div class="jd-body">' +
+        '<div class="jd-grid">' +
+          '<div class="jd-card what"><div class="jd-card-label">🔷 WHAT — Là gì?</div><div class="jd-card-body">' + d.what + '</div></div>' +
+          '<div class="jd-card when"><div class="jd-card-label">🕐 WHEN — Khi nào?</div><div class="jd-card-body">' + d.when + '</div></div>' +
+          '<div class="jd-card why"><div class="jd-card-label">💛 WHY — Tại sao?</div><div class="jd-card-body">' + d.why + '</div></div>' +
+          '<div class="jd-card how"><div class="jd-card-label">🟢 HOW — Làm thế nào?</div><div class="jd-card-body">' + d.how + '</div></div>' +
+        '</div>' +
+        '<div class="jd-tip">' + d.tip + '</div>' +
+      '</div>';
+  }
+
+  // ── Real-world phase accordion ──
+  function toggleRwPhase(header) {
+    const body = header.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    document.querySelectorAll('.rw-phase-header').forEach(h => h.classList.remove('open'));
+    document.querySelectorAll('.rw-phase-body').forEach(b  => b.classList.remove('open'));
+    if (!isOpen) {
+      header.classList.add('open');
+      body.classList.add('open');
+    }
+  }
+
+  // ── Quiz ──
+  const questions = [
+    {
+      q: 'Vector Search khác gì so với tìm kiếm từ khóa truyền thống?',
+      opts: [
+        'Nhanh hơn về mặt tốc độ',
+        'Hiểu được ngữ nghĩa, tìm kết quả tương đồng về ý nghĩa',
+        'Chỉ tìm được văn bản tiếng Anh',
+        'Không cần database',
+      ],
+      correct: 1,
+      explain: '✅ Đúng! Vector Search mã hóa văn bản thành vector số học đại diện cho ý nghĩa, từ đó tìm được kết quả tương đồng về nghĩa dù không trùng từ khóa.',
+    },
+    {
+      q: 'Flava Vector Search được xây dựng trên nền tảng nào?',
+      opts: ['Elasticsearch', 'Solr', 'OpenSearch', 'PostgreSQL'],
+      correct: 2,
+      explain: '✅ Đúng! Flava Vector Search là managed OpenSearch cluster với vector search extensions — được vận hành hoàn toàn bởi Flava.',
+    },
+    {
+      q: 'ML Model trong Vector Search dùng để làm gì?',
+      opts: [
+        'Backup dữ liệu tự động',
+        'Chuyển đổi văn bản thành vector (embedding)',
+        'Quản lý quyền truy cập',
+        'Tối ưu query SQL',
+      ],
+      correct: 1,
+      explain: '✅ Đúng! Embedding model nhận văn bản đầu vào và trả về dãy số (vector) đại diện cho ý nghĩa của văn bản đó.',
+    },
+    {
+      q: 'Đặc điểm nào giúp Flava VS phù hợp cho doanh nghiệp Việt Nam hơn các dịch vụ nước ngoài?',
+      opts: [
+        'Giao diện tiếng Việt',
+        'Giá rẻ hơn',
+        'Dữ liệu lưu trữ trong nước (data residency) + tích hợp IAM Flava',
+        'Hỗ trợ 24/7 tiếng Việt',
+      ],
+      correct: 2,
+      explain: '✅ Đúng! Data residency trong nước giúp tuân thủ quy định pháp lý, và tích hợp sâu với IAM Flava giúp quản lý quyền truy cập tập trung.',
+    },
+    {
+      q: '"Simulate pipeline" trong Vector Search dùng để làm gì?',
+      opts: [
+        'Test thử pipeline với dữ liệu mẫu trực tiếp trên UI trước khi deploy thật',
+        'Chạy stress test hiệu năng cluster',
+        'Tự động backup pipeline',
+        'Nhân bản pipeline sang service khác',
+      ],
+      correct: 0,
+      explain: '✅ Đúng! Simulate cho phép bạn kiểm tra xem pipeline xử lý dữ liệu như thế nào với dữ liệu mẫu ngay trên giao diện — giúp phát hiện lỗi trước khi ảnh hưởng đến production.',
+    },
+  ];
+
+  let currentQ = 0;
+  let score = 0;
+  let answered = false;
+
+  function initQuiz() {
+    currentQ = 0; score = 0; answered = false;
+    document.getElementById('quizScore').classList.remove('show');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    const progress = document.getElementById('quizProgress');
+    progress.innerHTML = questions.map((_, i) => {
+      let cls = 'quiz-pip';
+      if (i < currentQ) cls += ' done';
+      else if (i === currentQ) cls += ' current';
+      return `<div class="${cls}"></div>`;
+    }).join('');
+
+    document.getElementById('quizContent').innerHTML = `
+      <div class="quiz-q">Câu ${currentQ + 1}/${questions.length}: ${q.q}</div>
+      <div class="quiz-options">
+        ${q.opts.map((o, i) => `<button class="quiz-opt" onclick="answer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+      </div>
+      <div class="quiz-feedback" id="qFeedback"></div>
+      <button class="quiz-next" id="qNext" onclick="nextQ()">${currentQ < questions.length - 1 ? 'Câu tiếp theo →' : 'Xem kết quả 🎉'}</button>
+    `;
+    answered = false;
+  }
+
+  function answer(idx) {
+    if (answered) return;
+    answered = true;
+    const q = questions[currentQ];
+    const opts = document.querySelectorAll('.quiz-opt');
+    opts.forEach(o => o.disabled = true);
+    opts[q.correct].classList.add('correct');
+    const feedback = document.getElementById('qFeedback');
+    if (idx === q.correct) {
+      score++;
+      feedback.className = 'quiz-feedback show ok';
+      feedback.textContent = q.explain;
+    } else {
+      opts[idx].classList.add('wrong');
+      feedback.className = 'quiz-feedback show ko';
+      feedback.innerHTML = `❌ Chưa đúng. ${q.explain}`;
+    }
+    document.getElementById('qNext').classList.add('show');
+  }
+
+  function nextQ() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showScore();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showScore() {
+    document.getElementById('quizContent').innerHTML = '';
+    document.getElementById('quizProgress').innerHTML = questions.map(() => `<div class="quiz-pip done"></div>`).join('');
+    const scoreEl = document.getElementById('quizScore');
+    scoreEl.classList.add('show');
+    document.getElementById('scoreNum').textContent = `${score}/${questions.length}`;
+    const feedbacks = [
+      'Hãy đọc lại phần Tổng quan và thử lại nhé! 💪',
+      'Bạn đã hiểu cơ bản, hãy xem thêm phần Tính năng!',
+      'Khá tốt! Xem lại một vài phần để hoàn thiện hơn.',
+      'Rất tốt! Bạn đã hiểu Vector Search khá vững!',
+      'Xuất sắc! 🎉 Bạn nắm rõ Vector Search as a Service!',
+    ];
+    document.getElementById('scoreFeedback').textContent = feedbacks[score] || feedbacks[4];
+  }
+
+  function restartQuiz() { initQuiz(); }
+
+  // Init
+  selectStep(0);
+  initQuiz();
+</script>
+</body>
+</html>

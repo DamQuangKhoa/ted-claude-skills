@@ -1,0 +1,41 @@
+{
+  "skill_name": "flava-md-to-html",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a 150-line implementation plan in docs/local-dev-plan.md for product-lb VPC selection. Convert it to a single HTML file with tabs (Context, Approach, Files, Risks, Test plan) and an SVG data-flow diagram. Save next to the md file.",
+      "expected_output": "Standalone HTML (lang=vi, Vietnamese UI copy) at apps/product-lb/docs/local-dev-plan.html with working tabs, diagram present",
+      "files": [],
+      "expectations": [
+        "Output is a single .html file with embedded CSS and JS",
+        "Document uses tab navigation with at least 4 sections",
+        "Includes an inline SVG diagram",
+        "Does not use React or Vue"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Help me review PR #6920 for vector-search index template fix — I'm weak on the priority validator flow. Read the diff on branch CLOUDQA-90665 vs main and make an HTML artifact with severity-colored findings and 2-3 annotated code snippets from the actual files.",
+      "expected_output": "HTML PR review page with summary, severity groups, code blocks with paths, openable in browser",
+      "files": [],
+      "expectations": [
+        "References real file paths from the repo",
+        "Groups or tags findings by severity",
+        "Includes escaped code in pre/code blocks",
+        "Saved under docs/html/ or product docs folder"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Here's a paste of my markdown notes from a Jira RCA (3 headings, bullet gotchas, one table). Turn it into a one-page HTML explainer optimized for someone reading once — diagram at top, gotchas callout at bottom. Put in /tmp for now.",
+      "expected_output": "/tmp/flava-rca-explainer.html with explainer layout, no markdown syntax visible",
+      "files": [],
+      "expectations": [
+        "Single self-contained HTML file",
+        "Has executive summary and gotchas section",
+        "Table rendered as HTML table if source had table",
+        "Works without external CDN scripts"
+      ]
+    }
+  ]
+}

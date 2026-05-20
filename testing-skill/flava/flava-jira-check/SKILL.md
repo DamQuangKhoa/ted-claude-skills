@@ -25,6 +25,8 @@ Deliver work in this sequence. **Final user-facing output** after investigation 
 
 If the user only wants analysis, stop after **§4** (and step **5** in the table: no code changes).
 
+**Related:** To turn a Jira ticket (and optional Confluence wiki) into Spec Kit **spec / plan / tasks** and then implement after approval, use **`flava-jira-speckit-check`** instead of this debugging-oriented flow.
+
 ---
 
 ## 1. Fetch ticket details

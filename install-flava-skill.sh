@@ -210,6 +210,16 @@ main() {
         print_warning "    ⚠ Failed to download SKILL.md"
     fi
     
+    # flava-jira-speckit-check
+    print_info "  Installing flava-jira-speckit-check..."
+    mkdir -p "$SKILLS_DIR/flava-jira-speckit-check"
+    
+    if download_file "$REPO_BASE_URL/testing-skill/flava/flava-jira-speckit-check/SKILL.md" "$SKILLS_DIR/flava-jira-speckit-check/SKILL.md"; then
+        print_success "    ✓ SKILL.md"
+    else
+        print_warning "    ⚠ Failed to download SKILL.md"
+    fi
+    
     # Skill 4: flava-jira-create-sre-ticket
     print_info "  Installing flava-jira-create-sre-ticket..."
     mkdir -p "$SKILLS_DIR/flava-jira-create-sre-ticket"
@@ -297,6 +307,7 @@ main() {
     echo "  • .claude/skills/skill-creator-v2/"
     echo "  • .claude/skills/flava-commit-skill/"
     echo "  • .claude/skills/flava-jira-check/"
+    echo "  • .claude/skills/flava-jira-speckit-check/"
     echo "  • .claude/skills/flava-jira-create-sre-ticket/"
     echo "  • .claude/skills/flava-pr-skill/"
     echo "  • .claude/skills/flava-weekly-report/"

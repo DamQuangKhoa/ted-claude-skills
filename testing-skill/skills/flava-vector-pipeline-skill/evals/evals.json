@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-vector-pipeline-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "We added a new processor field type on the backend for vector search ingest. The dynamic form shows empty for that processor and saving drops the value. Which client files and BFF paths should I check first, and what usually breaks?",
+      "expected_output": "Answer cites PipelineFormValues/FieldType, ProcessorFieldRenderer + renderers, processorSerialization, pipelineMapping/pipelineCreation/pipelineEdit/pipelineComparison, Available API + composable, optional BFF available proxy; explains threading and simulate/compare gaps.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Search pipeline phase-results processors save in visual mode but disappear after refresh or show as unchanged in edit when I only touch phase. Where is the bug class and what functions compare or map phase processors?",
+      "expected_output": "Answer points to pipelineMapping (deserialize), pipelineCreation/pipelineEdit payloads, pipelineComparison for dirty state, code editor builder paths, phase_processors vs camelCase, and definitions list threading.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Product wants the search simulate request to include the same processor sections as the update API. Walk through how simulate is built for search and what to update so phase + request + response stay aligned without breaking ingest simulate.",
+      "expected_output": "Answer separates ingest vs search simulate types, names SearchPipelineVisual/simulate-related utils and SimulateSearchPipelineRequest, warns about payload shape differences and rules.ts/testConfig.",
+      "files": []
+    }
+  ]
+}

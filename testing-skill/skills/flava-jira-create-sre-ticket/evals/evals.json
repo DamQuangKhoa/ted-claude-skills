@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-jira-create-sre-ticket",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a LYCC SRE ticket: summary 'SRE | Test runbook for Redis failover', description with steps and owner, assign to my lead's email (use placeholder assignee@example.com if unknown), link to epic 'SRE | Temporary Epic', priority Medium, component SRE.",
+      "expected_output": "Uses Jira MCP to create LYCC issue with SRE component, epic link, assignee, priority; returns browse URL and confirms fields.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want a new ticket like https://jira.workers-hub.com/browse/LYCC-9796 but for 'rotate TLS certs on staging ALB' — same epic and component pattern, Task type.",
+      "expected_output": "Fetches LYCC-9796 (or asks for missing bits), creates new Task with SRE component and same epic as reference unless user overrides, returns new key and URL.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Search LYCC for open Epics with SRE in the name and list keys; do not create a ticket yet.",
+      "expected_output": "Uses jira_search with JQL, returns epic keys/summaries; does not call create unless user asked to.",
+      "files": []
+    }
+  ]
+}
