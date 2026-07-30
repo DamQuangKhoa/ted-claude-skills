@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-jira-continue-check",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "QA just found a bug on LYCC-9844 — the PR is already up but the replicas field lets you enter 0 and it crashes. Can you continue that ticket and fix it?",
+      "expected_output": "Skill fetches ticket (focus recent QA comment), detects existing branch + open PR, reads current diff, computes the delta (guard against 0 in replicas), presents a delta plan + todos, stops for approval before editing. Does NOT create a new branch/PR.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "CLOUDQA-100395 spec changed — reviewer says the tooltip wording should now also cover the credentials case. The PR is open already. Update it.",
+      "expected_output": "Skill reads ticket + PR review feedback, identifies what the current PR already does, plans only the incremental wording change as a delta, presents plan + todos, waits for approval. References updating the existing PR, not opening a new one.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "LYCC-11637 got reopened. Please continue it.",
+      "expected_output": "Skill detects the reopen signal, fetches recent comments to find WHY it was reopened, auto-detects existing branch + PR, reconciles against the new requirement, and produces a delta plan. If it can't find a branch/PR it should suggest flava-jira-check instead.",
+      "files": []
+    }
+  ]
+}

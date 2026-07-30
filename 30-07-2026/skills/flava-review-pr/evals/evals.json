@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-review-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review LB PR #6933 — check if it fixes the Jira ticket root cause. Don't post to GitHub yet.",
+      "expected_output": "GitHub PR fetch, Jira ticket, flava-jira-check root cause + expected fix, PR vs root cause table, LB standards checklist, draft review body. No pull_request_review_write.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "https://git.linecorp.com/LYCC/flava-console/pull/7000 — this is a product-lb pagination fix. Does the PR match what the ticket needs?",
+      "expected_output": "Scope limited to apps/product-lb, root cause from ticket+codebase, alignment table, enum/side-effect/unit-test checks from flava-lb-skill, approval gate at end",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Review only: my ChangeAppReplicaModal PR on branch fix/CLOUDQA-83781-lb-pagination",
+      "expected_output": "Resolves PR via search_pull_requests, runs jira-check investigation without git branch checkout, reviews modal side effects and QUERY_KEY invalidation, stops without posting",
+      "files": []
+    }
+  ]
+}

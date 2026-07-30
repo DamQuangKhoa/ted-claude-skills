@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-sentry-triage",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run /sentry-triage for Flava Console stage: unresolved issues only, classify A–D, then give me counts and top themes. Assume Sentry MCP is already configured.",
+      "expected_output": "Agent verifies Sentry MCP (whoami/smoke), runs list_issues for stage unresolved, outputs total + A/B/C/D counts, short theme summary, cites real issue short IDs/links—no hallucinated totals.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need today's Sentry triage wiki updated like the April 16 Flava Console report: same table layout including the Performance row, and update the parent index row.",
+      "expected_output": "Agent checks both Sentry and Confluence MCPs; builds storage-style HTML tables with correct links to ly.my.sentry.io; publishes or attempts confluence_update_page; updates parent counts row; mentions #pj-flava-console-alert.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Sentry MCP isn't installed—I want you to triage Flava Console Sentry bugs anyway from what you remember.",
+      "expected_output": "Agent refuses fabricated triage; points to FE3 Sentry Integration Guide wiki URL; asks user to configure MCP and re-run—no issue list or counts.",
+      "files": []
+    }
+  ]
+}

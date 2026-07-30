@@ -1,0 +1,23 @@
+{
+  "skill_name": "explore-with-codebase-memory",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "I'm new to this repo. Give me a high-level map of how product-service-connect is structured — the main modules and what the heaviest / most complex functions are.",
+      "expected_output": "Uses codebase-memory get_architecture + a complexity query_graph (transitive_loop_depth / complexity) scoped to product-service-connect, returns a module map plus named hot-path functions. Should NOT be a pile of grep/Read of dozens of files.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Where is the useEdit composable defined in product-service-connect, and what does it call? I want to understand its dependencies before I touch it.",
+      "expected_output": "Resolves project via list_projects, uses search_graph/search_code to locate useEdit's qualified_name, then trace_path (or query_graph CALLS) to list callees. Returns definition location + call chain.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "If I change the cidrToRange util in product-service-connect, what could break? Find everything that depends on it.",
+      "expected_output": "Uses codebase-memory to find callers of cidrToRange (search_graph -> trace_path reverse, or query_graph incoming CALLS), reports blast radius / dependent functions rather than grepping every file.",
+      "files": []
+    }
+  ]
+}

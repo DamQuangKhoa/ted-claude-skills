@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-blueprint-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Add a new column 'Updated by' to the deployment list table in product-cloud-blueprint. Wire search/filter if needed.",
+      "expected_output": "Enum + label in enums/deployment.ts, type updates if needed, composable/API unchanged or extended, List.vue column uses DeploymentColumnKey and TABLE_NAME pattern.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Fix CLOUDQA blueprint ticket: IAM service account link on deployment overview returns 404.",
+      "expected_output": "BasicInfo.vue uses useCurrentProject() and link `/${projectName}/iam/service-account/${name}` per skill external-link rule.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Add a new BFF endpoint and client composable to fetch deployment tags for cloud blueprint.",
+      "expected_output": "BFF module dto/service/controller, client DeploymentModel or nested type with Model suffix, apis/deployment.ts class method, QueryKey entry, useDeploymentTags composable with useCurrentProject/useRegion.",
+      "files": []
+    }
+  ]
+}

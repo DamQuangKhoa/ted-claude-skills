@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--
+  flava-review-pr report template
+  Replace {{PLACEHOLDER}} tokens when generating a review report.
+  Tabs: Tổng quan | Jira | So sánh fix | Chuẩn Flava | Findings | Draft review
+  The "Chuẩn Flava" panel holds both the code-standards table and the {{GATE_RESULTS}}
+  block (per-package lint / type:check / build pass-fail).
+-->
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{PAGE_TITLE}}</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface2: #222d3d;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3d8bfd;
+      --border: #2a3544;
+      --ok: #51cf66;
+      --warn: #ffa94d;
+      --bad: #ff6b6b;
+      --info: #74c0fc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { margin: 0 0 0.35rem; font-size: 1.35rem; }
+    header .meta { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .verdict {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .verdict-approve { background: rgba(81,207,102,.15); color: var(--ok); border: 1px solid var(--ok); }
+    .verdict-changes { background: rgba(255,107,107,.15); color: var(--bad); border: 1px solid var(--bad); }
+    .verdict-comment { background: rgba(116,192,252,.15); color: var(--info); border: 1px solid var(--info); }
+    nav.tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav.tabs button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+    nav.tabs button.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(61,139,253,.12);
+    }
+    main { max-width: 980px; margin: 0 auto; padding: 1.25rem; }
+    section.panel { display: none; }
+    section.panel.active { display: block; }
+    h2 { font-size: 1.15rem; margin: 1.5rem 0 0.75rem; }
+    h2:first-child { margin-top: 0; }
+    .callout {
+      border-left: 4px solid var(--accent);
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+    .callout-warn { border-left-color: var(--warn); }
+    .callout-bad { border-left-color: var(--bad); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.75rem 0; }
+    th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; vertical-align: top; }
+    th { background: var(--surface2); }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-ok { background: rgba(81,207,102,.2); color: var(--ok); }
+    .badge-warn { background: rgba(255,169,77,.2); color: var(--warn); }
+    .badge-bad { background: rgba(255,107,107,.2); color: var(--bad); }
+    .badge-info { background: rgba(116,192,252,.2); color: var(--info); }
+    pre {
+      background: #0a0e14;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .file-list { font-family: ui-monospace, monospace; font-size: 0.82rem; }
+    ul.findings { padding-left: 1.2rem; }
+    ul.findings li { margin: 0.4rem 0; }
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    textarea.export {
+      width: 100%;
+      min-height: 140px;
+      background: #0a0e14;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>{{HEADER_TITLE}}</h1>
+    <p class="meta">{{HEADER_META}}</p>
+    <span class="verdict {{VERDICT_CLASS}}">{{VERDICT_LABEL}}</span>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" class="active" data-tab="overview" role="tab">Tổng quan</button>
+    <button type="button" data-tab="jira" role="tab">Jira</button>
+    <button type="button" data-tab="alignment" role="tab">So sánh fix</button>
+    <button type="button" data-tab="standards" role="tab">Chuẩn Flava</button>
+    <button type="button" data-tab="findings" role="tab">Findings</button>
+    <button type="button" data-tab="draft" role="tab">Draft review</button>
+  </nav>
+
+  <main>
+    <section id="overview" class="panel active" role="tabpanel">
+      {{OVERVIEW_CONTENT}}
+    </section>
+    <section id="jira" class="panel" role="tabpanel">
+      {{JIRA_CONTENT}}
+    </section>
+    <section id="alignment" class="panel" role="tabpanel">
+      {{ALIGNMENT_CONTENT}}
+    </section>
+    <section id="standards" class="panel" role="tabpanel">
+      {{STANDARDS_CONTENT}}
+      {{GATE_RESULTS}}
+    </section>
+    <section id="findings" class="panel" role="tabpanel">
+      {{FINDINGS_CONTENT}}
+    </section>
+    <section id="draft" class="panel" role="tabpanel">
+      {{DRAFT_CONTENT}}
+    </section>
+    <footer>
+      Generated {{GENERATED_DATE}} · flava-review-pr · {{SOURCE_LINE}}
+    </footer>
+  </main>
+
+  <script>
+    document.querySelectorAll('nav.tabs button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('nav.tabs button').forEach((b) =>
+          b.classList.toggle('active', b === btn),
+        );
+        document.querySelectorAll('section.panel').forEach((p) =>
+          p.classList.toggle('active', p.id === tab),
+        );
+      });
+    });
+    function copyDraft() {
+      const el = document.getElementById('draft-export');
+      if (!el) return;
+      navigator.clipboard.writeText(el.value).then(() => alert('Đã sao chép draft review'));
+    }
+  </script>
+</body>
+</html>

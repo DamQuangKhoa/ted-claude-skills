@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><!-- TITLE --></title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #3d8bfd;
+      --border: #2a3544;
+      --sev-blocker: #ff6b6b;
+      --sev-major: #ffa94d;
+      --sev-minor: #ffd43b;
+      --sev-nit: #868e96;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+    header {
+      padding: 1.5rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    header h1 { margin: 0 0 0.35rem; font-size: 1.5rem; }
+    header p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+    nav.tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    nav.tabs button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    nav.tabs button.active {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(61, 139, 253, 0.12);
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+    section.panel { display: none; }
+    section.panel.active { display: block; }
+    .callout {
+      border-left: 4px solid var(--accent);
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+    pre {
+      background: #0a0e14;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    th { background: var(--surface); }
+    footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><!-- TITLE --></h1>
+    <p><!-- SUBTITLE / ticket link --></p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button type="button" class="active" data-tab="overview" role="tab">Tổng quan</button>
+    <button type="button" data-tab="details" role="tab">Chi tiết</button>
+    <button type="button" data-tab="appendix" role="tab">Phụ lục</button>
+  </nav>
+
+  <main>
+    <section id="overview" class="panel active" role="tabpanel">
+      <h2>Tổng quan</h2>
+      <p><!-- nội dung --></p>
+      <div class="callout"><strong>Lưu ý.</strong> Thay nội dung mẫu bằng nội dung thật.</div>
+    </section>
+
+    <section id="details" class="panel" role="tabpanel">
+      <h2>Chi tiết</h2>
+      <!-- tables, diagrams, snippets -->
+    </section>
+
+    <section id="appendix" class="panel" role="tabpanel">
+      <h2>Phụ lục</h2>
+      <textarea id="export-block" readonly rows="6" style="width:100%;background:#0a0e14;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:0.75rem;"></textarea>
+      <p><button type="button" class="btn" onclick="copyExport()">Sao chép</button></p>
+    </section>
+
+    <footer>
+      Generated <!-- DATE --> · Source: <!-- SOURCE -->
+    </footer>
+  </main>
+
+  <script>
+    document.querySelectorAll('nav.tabs button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        document.querySelectorAll('nav.tabs button').forEach((b) => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('section.panel').forEach((p) => p.classList.toggle('active', p.id === tab));
+      });
+    });
+
+    function copyExport() {
+      const text = document.getElementById('export-block').value;
+      navigator.clipboard.writeText(text).then(() => alert('Copied'));
+    }
+  </script>
+</body>
+</html>

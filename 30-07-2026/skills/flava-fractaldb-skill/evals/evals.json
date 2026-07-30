@@ -1,0 +1,23 @@
+{
+  "skill_name": "flava-fractaldb-skill",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implement the client-side namespace list API and composable in product-dbs-for-fractaldb. namespace.ts is currently a stub.",
+      "expected_output": "namespaceApi.getNamespaces with Flava-Region header and API_PREFIX, NamespaceModel types in types/fractaldb/, QueryKey.GetNamespaces, useNamespaces composable with useCurrentProject/useRegion, list unwrap matching BFF NamespaceListDto shape.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Add a 'Farm' column to the namespace list table in dbs-for-fractaldb. Wire sort/filter if the API supports it.",
+      "expected_output": "Column key + label in a namespace enum file, TABLE_NAME.NAMESPACE with useTable, no hard-coded query keys, farm field on NamespaceSummaryModel or RedefinedNamespaceModel.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Fix FractalDB ticket: VPC create link from namespace create form goes to /vpc/... without project and 404s.",
+      "expected_output": "Use useExternalLink().createVpcLink or /${projectName}/vpc/service/create per skill external-link rule; no bare /vpc paths.",
+      "files": []
+    }
+  ]
+}
